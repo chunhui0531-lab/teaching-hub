@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Unit 3a｜披薩切片：切同樣角度，大小披薩的邊緣各多長？</title>
+<style>
+:root{--bg:#fff7ed;--panel:#fff;--text:#1c1917;--muted:#78716c;--line:#e7e5e4;--accent:#ea580c;--red:#ef4444;--good:#16a34a;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans TC","PingFang TC",sans-serif;padding-top:64px;}
+header.topbar{position:fixed;top:0;left:0;right:0;height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;z-index:9999;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.brand{font-weight:800;color:var(--accent);font-size:1.1rem;margin-right:auto;}
+.wrap{max-width:1050px;margin:0 auto;padding:16px 20px;}
+.card{background:#fff;border:2px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.04);}
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+@media(max-width:860px){.main-grid{grid-template-columns:1fr;}}
+canvas{display:block;width:100%;}
+/* controls */
+input[type=range]{width:100%;height:10px;-webkit-appearance:none;appearance:none;background:#fed7aa;border-radius:5px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.2);}
+.size-btns{display:flex;gap:8px;margin-bottom:12px;}
+.sz-btn{flex:1;padding:8px 4px;border:2px solid var(--line);border-radius:8px;background:#fff;font-weight:700;font-size:14px;cursor:pointer;transition:all .15s;text-align:center;}
+.sz-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+/* steps */
+.step-block{border-left:4px solid #fdba74;background:#fff7ed;border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:12px;}
+.step-block.locked{opacity:.45;pointer-events:none;}
+.step-title{font-weight:700;font-size:15px;color:var(--accent);margin-bottom:6px;}
+/* table */
+table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0;}
+th{background:#fff7ed;padding:7px 6px;font-weight:700;color:var(--muted);border-bottom:2px solid var(--line);text-align:center;}
+td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:center;}
+td input[type=number]{width:72px;padding:4px;border:1.5px solid #d6d3d1;border-radius:6px;font-size:14px;text-align:center;}
+tr.done td{background:#fef9c3;}
+/* formula box */
+.formula-slot{display:inline-flex;align-items:center;gap:6px;background:#fff7ed;border:2px solid #fdba74;border-radius:8px;padding:6px 12px;font-weight:700;font-size:16px;}
+select.formula-sel{padding:4px 8px;border:1.5px solid #fdba74;border-radius:6px;font-size:15px;font-weight:700;background:#fff;cursor:pointer;}
+/* action buttons */
+.act-btn{padding:9px 18px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;}
+.act-btn.primary{background:var(--accent);color:#fff;}
+.act-btn.primary:hover{filter:brightness(1.1);}
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(28,25,23,.9);color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;z-index:500;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.conc-box{display:none;background:linear-gradient(135deg,#fefce8,#fef9c3);border:2px solid #fde047;border-radius:14px;padding:18px;margin-top:12px;}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <span class="brand">🍕 Unit 3a｜披薩切片</span>
+  <span style="font-size:13px;color:var(--muted);">切同樣角度，大小披薩的邊緣各多長？</span>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2 style="margin:0 0 6px;font-size:20px;">🍕 情境：不同大小的披薩，切同樣角度的一片</h2>
+    <p style="color:var(--muted);font-size:14px;margin:0 0 10px;">披薩店有三種尺寸的披薩：小、中、大。每次切片都用<b>相同的切角</b>，但三種披薩的邊緣（弧）長度一樣嗎？</p>
+    <div style="background:#ffedd5;border-left:4px solid var(--accent);border-radius:8px;padding:11px 15px;font-size:14px;color:#7c2d12;line-height:1.7;">
+      🔍 <b>探究目標：</b>觀察切片角度和披薩大小（半徑）如何影響邊緣（弧）長度，最後推導出弧長公式。
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- Left: Pizza canvas -->
+    <div class="card" style="padding:16px;">
+      <div class="size-btns" id="sizeBtns">
+        <div class="sz-btn active" data-size="0">🍕 小 (r=15cm)</div>
+        <div class="sz-btn" data-size="1">🍕 中 (r=20cm)</div>
+        <div class="sz-btn" data-size="2">🍕 大 (r=28cm)</div>
+      </div>
+      <canvas id="pizzaCanvas" height="320"></canvas>
+      <div style="margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <span style="font-size:13px;font-weight:700;color:var(--muted);">✂️ 切片角度</span>
+          <input type="range" id="slAngle" min="20" max="150" value="60" step="5">
+          <span style="font-weight:800;font-size:16px;color:var(--accent);min-width:44px;text-align:right;" id="valAngle">60°</span>
+        </div>
+        <div style="background:#fff7ed;border-radius:10px;padding:12px;text-align:center;">
+          <span style="font-size:13px;color:var(--muted);">這片的邊緣（弧長）≈</span>
+          <span style="font-size:22px;font-weight:800;color:var(--accent);margin-left:8px;" id="liveArcLen">—</span>
+          <span style="color:var(--muted);font-size:13px;"> cm</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Step tasks -->
+    <div>
+      <!-- Step 1: Record table -->
+      <div class="step-block" id="step1">
+        <div class="step-title">📋 步驟一：填入三種披薩的邊緣長度</div>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px;">先固定切片角度，依序切換三種尺寸，把圖上顯示的弧長填入表格：</p>
+        <table>
+          <thead><tr><th>披薩</th><th>半徑 r</th><th>切片角 θ</th><th>邊緣長 L</th></tr></thead>
+          <tbody id="recTable">
+            <tr data-row="0"><td>🍕 小</td><td>15 cm</td><td id="ang0">—</td><td><input type="number" id="rec0" placeholder="?" min="0" step="0.1"></td></tr>
+            <tr data-row="1"><td>🍕 中</td><td>20 cm</td><td id="ang1">—</td><td><input type="number" id="rec1" placeholder="?" min="0" step="0.1"></td></tr>
+            <tr data-row="2"><td>🍕 大</td><td>28 cm</td><td id="ang2">—</td><td><input type="number" id="rec2" placeholder="?" min="0" step="0.1"></td></tr>
+          </tbody>
+        </table>
+        <button class="act-btn primary" id="checkStep1" style="margin-top:8px;">✓ 確認記錄</button>
+      </div>
+
+      <!-- Step 2: Pattern (locked) -->
+      <div class="step-block locked" id="step2">
+        <div class="step-title">🔍 步驟二：找出規律</div>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px;">計算 <b>邊緣長 ÷ 半徑</b>，看看有沒有規律：</p>
+        <table>
+          <thead><tr><th>披薩</th><th>L ÷ r</th><th>= 多少倍？</th></tr></thead>
+          <tbody>
+            <tr><td>小</td><td id="ratio0">—</td><td id="ratio0x">—</td></tr>
+            <tr><td>中</td><td id="ratio1">—</td><td id="ratio1x">—</td></tr>
+            <tr><td>大</td><td id="ratio2">—</td><td id="ratio2x">—</td></tr>
+          </tbody>
+        </table>
+        <div id="patternHint" style="display:none;background:#fef9c3;border-radius:8px;padding:10px;font-size:14px;color:#713f12;margin-top:8px;line-height:1.7;">
+          💡 <b>你發現了！</b>三個比值 L÷r 幾乎相同。<br>
+          這個比值是 <b>2π × (θ/360°)</b>，只由切片角度決定！<br>
+          所以：<b>L = r × 比值 = r × 2π × (θ/360°)</b>
+        </div>
+        <button class="act-btn primary" id="unlockStep3" style="margin-top:8px;display:none;">繼續 → 推導公式</button>
+      </div>
+
+      <!-- Step 3: Formula (locked) -->
+      <div class="step-block locked" id="step3">
+        <div class="step-title">✏️ 步驟三：完成公式</div>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 10px;">根據你的觀察，選出正確的弧長公式：</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px;border:1.5px solid var(--line);border-radius:8px;">
+            <input type="radio" name="formula" value="a"> 邊緣長 = r + θ
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px;border:1.5px solid var(--line);border-radius:8px;">
+            <input type="radio" name="formula" value="b"> 邊緣長 = π × r
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px;border:1.5px solid var(--line);border-radius:8px;" id="correctOpt">
+            <input type="radio" name="formula" value="c"> 邊緣長 = 2πr × (θ / 360°)
+          </label>
+        </div>
+        <button class="act-btn primary" id="checkFormula" style="margin-top:10px;">確認公式</button>
+
+        <div class="conc-box" id="concBox">
+          <b style="color:#713f12;font-size:16px;">🎉 完全正確！</b>
+          <p style="font-size:14px;color:#78350f;line-height:1.8;margin:8px 0;">不管披薩大小，<b>切片角度</b>和<b>半徑</b>共同決定了邊緣長度：</p>
+          <div style="background:#fff;border-radius:10px;padding:12px;text-align:center;font-size:20px;font-weight:800;color:#92400e;border:2px solid #fcd34d;">
+            L = 2πr × (θ / 360°)
+          </div>
+          <p style="font-size:13px;color:#a16207;margin:10px 0 0;line-height:1.7;">
+            💡 大披薩切片的邊緣，正比於半徑 r。<br>
+            切角越大，邊緣也越長——它們也成正比！
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+  const TAU=Math.PI*2,DEG=Math.PI/180;
+  const RADII=[15,20,28]; // cm
+  const COLORS=['#ef4444','#f97316','#eab308'];
+  let selSize=0;
+
+  const canvas=document.getElementById('pizzaCanvas');
+  const ctx=canvas.getContext('2d');
+  const sl=document.getElementById('slAngle');
+
+  function resize(){
+    const dpr=window.devicePixelRatio||1;
+    const W=canvas.parentElement.getBoundingClientRect().width-32;
+    const H=Math.min(W,340);
+    canvas.width=W*dpr; canvas.height=H*dpr;
+    canvas.style.width=W+'px'; canvas.style.height=H+'px';
+    ctx.resetTransform(); ctx.scale(dpr,dpr);
+    draw();
+  }
+
+  function draw(){
+    const dpr=window.devicePixelRatio||1;
+    const W=canvas.width/dpr, H=canvas.height/dpr;
+    ctx.clearRect(0,0,W,H);
+
+    const angle=parseInt(sl.value);
+    const r=RADII[selSize];
+    const scale=(Math.min(W,H)*0.38)/RADII[2];
+    const rpx=r*scale;
+    const cx=W/2, cy=H/2;
+    const col=COLORS[selSize];
+    const startA=-Math.PI/2, endA=startA+angle*DEG;
+
+    // Draw all three pizzas faintly
+    RADII.forEach((ri,i)=>{
+      if(i===selSize) return;
+      const rp=ri*scale;
+      ctx.beginPath(); ctx.arc(cx,cy,rp,0,TAU);
+      ctx.fillStyle='#fef3c7'; ctx.fill();
+      ctx.strokeStyle='#fcd34d'; ctx.lineWidth=1.5; ctx.stroke();
+    });
+
+    // Selected pizza body
+    ctx.beginPath(); ctx.arc(cx,cy,rpx,0,TAU);
+    // Pizza gradient
+    const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,rpx);
+    grad.addColorStop(0,'#fef3c7'); grad.addColorStop(0.7,'#fde68a'); grad.addColorStop(1,'#d97706');
+    ctx.fillStyle=grad; ctx.fill();
+    ctx.strokeStyle='#92400e'; ctx.lineWidth=2.5; ctx.stroke();
+
+    // Toppings dots
+    const seed=selSize*17+11;
+    for(let i=0;i<(selSize+1)*6;i++){
+      const a=((seed*i+7)%360)*DEG;
+      const dist=rpx*0.2+rpx*0.55*((seed*i+3)%10)/10;
+      const tx=cx+dist*Math.cos(a), ty=cy+dist*Math.sin(a);
+      ctx.beginPath(); ctx.arc(tx,ty,2.5,0,TAU);
+      ctx.fillStyle=['#ef4444','#10b981','#92400e'][(i+seed)%3]; ctx.fill();
+    }
+
+    // Slice sector highlight
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,rpx,startA,endA); ctx.closePath();
+    ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.fill();
+    ctx.strokeStyle=col; ctx.lineWidth=3; ctx.stroke();
+
+    // Crust arc (thick)
+    ctx.beginPath(); ctx.arc(cx,cy,rpx,startA,endA);
+    ctx.strokeStyle=col; ctx.lineWidth=8; ctx.lineCap='round'; ctx.stroke();
+
+    // Radius lines
+    ctx.beginPath();
+    ctx.moveTo(cx,cy); ctx.lineTo(cx+rpx*Math.cos(startA),cy+rpx*Math.sin(startA));
+    ctx.moveTo(cx,cy); ctx.lineTo(cx+rpx*Math.cos(endA),cy+rpx*Math.sin(endA));
+    ctx.strokeStyle=col+'cc'; ctx.lineWidth=2; ctx.lineCap='butt'; ctx.stroke();
+
+    // Angle label
+    ctx.beginPath();
+    ctx.arc(cx,cy,rpx*0.28,startA,endA);
+    ctx.strokeStyle='#374151'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.fillStyle='#374151'; ctx.font='bold 13px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    const mid=startA+angle*DEG/2;
+    ctx.fillText(angle+'°',cx+rpx*0.38*Math.cos(mid),cy+rpx*0.38*Math.sin(mid));
+
+    // Arc length label
+    const arcLen=2*Math.PI*r*(angle/360);
+    ctx.fillStyle=col; ctx.font='bold 14px system-ui'; ctx.textAlign='center';
+    ctx.fillText('邊緣 ≈ '+arcLen.toFixed(1)+' cm',cx+(rpx+18)*Math.cos(mid),(cy+(rpx+18)*Math.sin(mid)));
+
+    // Center label
+    ctx.fillStyle='#78350f'; ctx.font='bold 12px system-ui'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.fillText('r='+r+'cm', cx, cy+rpx+18);
+
+    // Update live display
+    document.getElementById('liveArcLen').textContent=arcLen.toFixed(1);
+    document.getElementById('valAngle').textContent=angle+'°';
+
+    // Update angle cells in table
+    RADII.forEach((_,i)=>{ const el=document.getElementById('ang'+i); if(el) el.textContent=angle+'°'; });
+  }
+
+  // Size buttons
+  document.getElementById('sizeBtns').querySelectorAll('.sz-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      selSize=parseInt(btn.dataset.size);
+      document.querySelectorAll('.sz-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      draw();
+    });
+  });
+  sl.addEventListener('input', draw);
+
+  // Step 1 check
+  document.getElementById('checkStep1').addEventListener('click',()=>{
+    const angle=parseInt(sl.value);
+    let ok=true;
+    RADII.forEach((r,i)=>{
+      const expected=parseFloat((2*Math.PI*r*(angle/360)).toFixed(1));
+      const val=parseFloat(document.getElementById('rec'+i).value);
+      const row=document.querySelector(`tr[data-row="${i}"]`);
+      if(!isNaN(val)&&Math.abs(val-expected)<expected*0.06){
+        row.classList.add('done');
+        document.getElementById('rec'+i).style.borderColor='#16a34a';
+      } else { ok=false; document.getElementById('rec'+i).style.borderColor='#ef4444'; }
+    });
+    if(ok){
+      document.getElementById('step2').classList.remove('locked');
+      // Fill ratios
+      const angle2=parseInt(sl.value);
+      RADII.forEach((r,i)=>{
+        const val=parseFloat(document.getElementById('rec'+i).value);
+        const ratio=val/r;
+        document.getElementById('ratio'+i).textContent=ratio.toFixed(3);
+        const theory=2*Math.PI*(angle2/360);
+        document.getElementById('ratio'+i+'x').textContent='≈ 2π×('+angle2+'÷360)='+theory.toFixed(3);
+      });
+      setTimeout(()=>{
+        document.getElementById('patternHint').style.display='block';
+        document.getElementById('unlockStep3').style.display='inline-block';
+      },400);
+      toast('✅ 記錄正確！觀察 L÷r 的規律！');
+    } else {
+      toast('📌 提示：弧長 = 2π × r × (θ/360)，用計算機算算看');
+    }
+  });
+
+  document.getElementById('unlockStep3').addEventListener('click',()=>{
+    document.getElementById('step3').classList.remove('locked');
+    document.getElementById('step3').scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+
+  // Formula check
+  document.getElementById('checkFormula').addEventListener('click',()=>{
+    const sel=document.querySelector('input[name="formula"]:checked');
+    if(!sel){toast('請先選擇一個公式！');return;}
+    if(sel.value==='c'){
+      document.getElementById('concBox').style.display='block';
+      document.getElementById('correctOpt').style.background='#f0fdf4';
+      document.getElementById('correctOpt').style.border='2px solid #16a34a';
+      setTimeout(()=>document.getElementById('concBox').scrollIntoView({behavior:'smooth'}),200);
+      toast('🎉 完全正確！你推導出弧長公式了！');
+    } else {
+      toast('❌ 再想想看：邊緣長度跟切角成正比，跟半徑也成正比，應該是乘法關係！');
+    }
+  });
+
+  function toast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),3500);
+  }
+
+  window.addEventListener('resize',resize);
+  resize();
+})();
+</script>
+</body>
+</html>

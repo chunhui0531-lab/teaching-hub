@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Unit 5b｜圓周角定理：先看動畫，再自己驗證</title>
+<style>
+:root{--bg:#0f172a;--panel:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--line:#334155;--accent:#818cf8;--cyan:#22d3ee;--green:#34d399;--orange:#fb923c;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans TC","PingFang TC",sans-serif;padding-top:64px;font-size:15px;}
+header.topbar{position:fixed;top:0;left:0;right:0;height:64px;background:#1e293b;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;z-index:9999;}
+.brand{font-weight:800;color:var(--accent);font-size:1.1rem;margin-right:auto;}
+.wrap{max-width:960px;margin:0 auto;padding:20px;}
+/* Phase tabs */
+.phase-tabs{display:flex;gap:8px;margin-bottom:20px;}
+.ptab{flex:1;padding:10px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--muted);font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;text-align:center;}
+.ptab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.phase{display:none;}
+.phase.active{display:block;}
+/* Canvas */
+canvas.main-cv{display:block;width:100%;background:#1e293b;border-radius:16px;border:2px solid var(--line);}
+/* Angle display */
+.angle-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+.angle-box{background:var(--panel);border-radius:12px;padding:16px;border:2px solid var(--line);text-align:center;}
+.angle-label{font-size:13px;color:var(--muted);margin-bottom:4px;}
+.angle-val{font-size:2.2rem;font-weight:800;font-family:monospace;}
+.ratio-box{background:var(--panel);border-radius:12px;padding:12px;border:2px solid var(--line);text-align:center;margin-top:10px;}
+/* Controls */
+button.ctrl{padding:10px 22px;border:2px solid var(--accent);border-radius:10px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;}
+button.ctrl:hover{filter:brightness(1.15);}
+button.ctrl.outline{background:transparent;color:var(--accent);}
+.ctrl-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;justify-content:center;}
+/* Info cards */
+.info-card{background:var(--panel);border-radius:12px;padding:16px;border:2px solid var(--line);font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:12px;}
+.info-card b{color:var(--text);}
+.badge{display:inline-block;background:var(--accent);color:#fff;font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;margin-right:4px;}
+/* Verify section */
+.verify-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;}
+@media(max-width:700px){.verify-grid{grid-template-columns:1fr;}}
+/* Observation input */
+textarea{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:10px;font-size:14px;font-family:inherit;resize:vertical;min-height:70px;background:#0f172a;color:var(--text);transition:border .2s;}
+textarea:focus{outline:none;border-color:var(--accent);}
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,41,59,.95);color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;z-index:500;border:1px solid var(--line);}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+/* Progress bar */
+.prog{height:4px;background:var(--line);border-radius:2px;margin-bottom:16px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .5s;}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <span class="brand">⭕ Unit 5b｜圓周角定理</span>
+  <span style="font-size:13px;color:var(--muted);">先看動畫，再親自驗證</span>
+</header>
+
+<div class="wrap">
+
+  <div class="prog"><div class="prog-fill" id="progFill" style="width:25%;"></div></div>
+
+  <div class="phase-tabs">
+    <button class="ptab active" onclick="switchPhase(1)">① 看動畫</button>
+    <button class="ptab" onclick="switchPhase(2)" id="tab2">② 先猜一猜</button>
+    <button class="ptab" onclick="switchPhase(3)" id="tab3">③ 自己驗證</button>
+    <button class="ptab" onclick="switchPhase(4)" id="tab4">④ 你的結論</button>
+  </div>
+
+  <!-- Phase 1: Watch animation -->
+  <div class="phase active" id="phase1">
+    <div class="info-card">
+      <b>🎬 觀察動畫：</b>P 點會自動在圓弧上移動。<br>
+      請仔細觀察：圓周角 ∠APB 和圓心角 ∠AOB 的數值，有什麼關係？
+    </div>
+    <canvas class="main-cv" id="cvAnim" height="380"></canvas>
+    <div class="angle-row">
+      <div class="angle-box" style="border-color:#22d3ee;">
+        <div class="angle-label">圓周角 ∠APB（P在圓上）</div>
+        <div class="angle-val" id="inscribedAngle" style="color:#22d3ee;">—°</div>
+      </div>
+      <div class="angle-box" style="border-color:#fb923c;">
+        <div class="angle-label">圓心角 ∠AOB（O在圓心）</div>
+        <div class="angle-val" id="centralAngle" style="color:#fb923c;">—°</div>
+      </div>
+    </div>
+    <div class="ratio-box">
+      <span style="color:var(--muted);font-size:14px;">圓心角 ÷ 圓周角 = </span>
+      <span class="angle-val" id="ratioVal" style="font-size:1.6rem;color:var(--green);">—</span>
+      <span style="color:var(--muted);font-size:13px;margin-left:4px;">（P 點在圓弧的一側時）</span>
+    </div>
+    <div class="ctrl-row">
+      <button class="ctrl" id="animBtn">⏸ 暫停動畫</button>
+      <button class="ctrl outline" id="resetAnimBtn">↩ 重播</button>
+    </div>
+    <div class="ctrl-row" style="margin-top:8px;">
+      <button class="ctrl" onclick="switchPhase(2)" style="background:#334155;border-color:#475569;font-size:14px;">我看完了，去猜測 →</button>
+    </div>
+  </div>
+
+  <!-- Phase 2: Predict -->
+  <div class="phase" id="phase2">
+    <div class="info-card">
+      <b>🤔 在你親自拖動之前，先寫下你的猜測：</b><br>
+      根據你剛才看到的動畫，圓周角和圓心角之間有什麼關係？
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;"><span class="badge">猜測 1</span> 圓周角的大小是多少？</div>
+        <textarea placeholder="我猜圓周角 ∠APB = __________（例如：圓心角的一半、等於圓心角、……）"></textarea>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;"><span class="badge">猜測 2</span> 如果 P 點移動到圓弧上其他位置，圓周角會改變嗎？</div>
+        <textarea placeholder="我猜：當 P 移動時，∠APB 會……（例如：不變、變大、……）"></textarea>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;"><span class="badge">猜測 3</span> 如果 A、B 位置改變，圓心角改變了，圓周角怎麼變？</div>
+        <textarea placeholder="我猜：如果圓心角變為原本的2倍，圓周角會……"></textarea>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <button class="ctrl" onclick="switchPhase(3)">寫好了，去自己拖看看 →</button>
+    </div>
+  </div>
+
+  <!-- Phase 3: Verify -->
+  <div class="phase" id="phase3">
+    <div class="info-card">
+      <b>🖱️ 現在換你操作：</b>拖動圓上的點，親自驗證你的猜測！<br>
+      可以拖動的點：<span style="color:#22d3ee;">P（圓周角頂點）</span> · <span style="color:#818cf8;">A 和 B（圓弧兩端）</span>
+    </div>
+    <div class="verify-grid">
+      <div>
+        <canvas class="main-cv" id="cvVerify" height="380"></canvas>
+        <div class="angle-row">
+          <div class="angle-box" style="border-color:#22d3ee;">
+            <div class="angle-label">圓周角 ∠APB</div>
+            <div class="angle-val" id="vInscribed" style="color:#22d3ee;">—°</div>
+          </div>
+          <div class="angle-box" style="border-color:#fb923c;">
+            <div class="angle-label">圓心角 ∠AOB</div>
+            <div class="angle-val" id="vCentral" style="color:#fb923c;">—°</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="angle-box" style="border-color:var(--green);text-align:center;margin-bottom:12px;">
+          <div class="angle-label">圓心角 ÷ 圓周角</div>
+          <div class="angle-val" id="vRatio" style="color:var(--green);font-size:2rem;">—</div>
+        </div>
+        <div class="info-card" style="font-size:13px;">
+          <b>💡 拖動提示：</b><br>
+          · P 點→ 在圓弧上滑動，觀察角度是否改變<br>
+          · A / B → 移動弧的兩端，改變圓心角大小<br><br>
+          <b>驗證你的三個猜測：</b>
+        </div>
+        <textarea placeholder="驗證結果：拖動後我發現……（與我的猜測相比……）" style="min-height:100px;"></textarea>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <button class="ctrl" onclick="switchPhase(4)">我驗證完了，寫結論 →</button>
+    </div>
+  </div>
+
+  <!-- Phase 4: Conclusion -->
+  <div class="phase" id="phase4">
+    <div class="info-card">
+      <b>📝 圓周角定理</b><br>
+      根據你的觀察和驗證，你已經「發現」了這個重要的幾何定理！
+    </div>
+    <div style="background:var(--panel);border:2px solid var(--accent);border-radius:14px;padding:20px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:14px;color:var(--muted);margin-bottom:10px;">圓周角定理</div>
+      <div style="font-size:1.4rem;font-weight:800;color:var(--accent);line-height:1.8;">
+        ∠APB（圓周角）= ½ × ∠AOB（圓心角）
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-top:8px;">
+        同一段弧上，不論 P 在哪裡，圓周角都相等且等於圓心角的一半。
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">✏️ 用自己的話說明這個定理：</div>
+        <textarea placeholder="圓周角定理告訴我們……（用自己的話）"></textarea>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">💭 你的猜測和實際結果相比，有哪些一樣？哪些不一樣？</div>
+        <textarea placeholder="我原本猜……，實際上……"></textarea>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">🌟 應用題：如果圓心角是 80°，圓周角是幾度？</div>
+        <textarea placeholder="答：圓周角 = ___°，理由：……" style="min-height:50px;"></textarea>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <button class="ctrl outline" onclick="switchPhase(1)" style="font-size:13px;">← 重新看一遍動畫</button>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+  const TAU=Math.PI*2, DEG=Math.PI/180;
+  let animRunning=true, animId=null, pAngle=Math.PI*0.6;
+
+  // ---- Animation canvas (Phase 1) ----
+  const cvA=document.getElementById('cvAnim');
+  const ctxA=cvA.getContext('2d');
+  let circleA={cx:0,cy:0,r:0};
+
+  function resizeA(){
+    const dpr=window.devicePixelRatio||1;
+    const W=cvA.parentElement.getBoundingClientRect().width;
+    const H=380;
+    cvA.width=W*dpr; cvA.height=H*dpr; cvA.style.width=W+'px'; cvA.style.height=H+'px';
+    ctxA.resetTransform(); ctxA.scale(dpr,dpr);
+    circleA={cx:W/2,cy:H/2,r:Math.min(W,H)*0.34};
+  }
+
+  const aA=Math.PI*1.6, aB=Math.PI*0.2; // fixed A, B positions
+  function drawAnim(){
+    const {cx,cy,r}=circleA;
+    const dpr=window.devicePixelRatio||1;
+    const W=cvA.width/dpr,H=cvA.height/dpr;
+    ctxA.clearRect(0,0,W,H);
+
+    // Circle
+    ctxA.beginPath(); ctxA.arc(cx,cy,r,0,TAU);
+    ctxA.strokeStyle='#334155'; ctxA.lineWidth=2; ctxA.stroke();
+
+    // Arc highlight between A and B
+    ctxA.beginPath(); ctxA.arc(cx,cy,r,aB,aA);
+    ctxA.strokeStyle='#818cf833'; ctxA.lineWidth=12; ctxA.stroke();
+
+    // Points A and B
+    const ax=cx+r*Math.cos(aA),ay=cy+r*Math.sin(aA);
+    const bx=cx+r*Math.cos(aB),by=cy+r*Math.sin(aB);
+    const px=cx+r*Math.cos(pAngle),py=cy+r*Math.sin(pAngle);
+
+    // Central angle lines
+    ctxA.beginPath(); ctxA.moveTo(cx,cy); ctxA.lineTo(ax,ay); ctxA.moveTo(cx,cy); ctxA.lineTo(bx,by);
+    ctxA.strokeStyle='#fb923c55'; ctxA.lineWidth=2; ctxA.setLineDash([4,4]); ctxA.stroke(); ctxA.setLineDash([]);
+
+    // Central angle arc
+    let ca=aA, cb=aB; if(ca>cb) [ca,cb]=[cb,ca];
+    ctxA.beginPath(); ctxA.arc(cx,cy,r*0.28,ca,cb);
+    ctxA.strokeStyle='#fb923c'; ctxA.lineWidth=3; ctxA.stroke();
+
+    // Inscribed angle lines P->A, P->B
+    ctxA.beginPath(); ctxA.moveTo(px,py); ctxA.lineTo(ax,ay); ctxA.moveTo(px,py); ctxA.lineTo(bx,by);
+    ctxA.strokeStyle='#22d3ee'; ctxA.lineWidth=2.5; ctxA.stroke();
+
+    // Inscribed angle arc at P
+    const pa1=Math.atan2(ay-py,ax-px), pa2=Math.atan2(by-py,bx-px);
+    ctxA.beginPath(); ctxA.arc(px,py,r*0.12,Math.min(pa1,pa2),Math.max(pa1,pa2));
+    ctxA.strokeStyle='#22d3ee'; ctxA.lineWidth=2; ctxA.stroke();
+
+    // Dot O
+    ctxA.beginPath(); ctxA.arc(cx,cy,5,0,TAU); ctxA.fillStyle='#fb923c'; ctxA.fill();
+    ctxA.fillStyle='#fb923c'; ctxA.font='bold 13px system-ui'; ctxA.textAlign='left'; ctxA.textBaseline='bottom';
+    ctxA.fillText('O',cx+8,cy-4);
+
+    // Dot A
+    ctxA.beginPath(); ctxA.arc(ax,ay,7,0,TAU); ctxA.fillStyle='#818cf8'; ctxA.fill();
+    ctxA.fillStyle='#818cf8'; ctxA.font='bold 14px system-ui'; ctxA.textAlign='center';
+    ctxA.fillText('A',ax+Math.cos(aA)*16,ay+Math.sin(aA)*16);
+
+    // Dot B
+    ctxA.beginPath(); ctxA.arc(bx,by,7,0,TAU); ctxA.fillStyle='#818cf8'; ctxA.fill();
+    ctxA.fillStyle='#818cf8'; ctxA.fillText('B',bx+Math.cos(aB)*16,by+Math.sin(aB)*16);
+
+    // Dot P (animated)
+    ctxA.beginPath(); ctxA.arc(px,py,9,0,TAU); ctxA.fillStyle='#22d3ee'; ctxA.fill();
+    ctxA.fillStyle='#22d3ee'; ctxA.font='bold 14px system-ui';
+    ctxA.fillText('P',px+Math.cos(pAngle)*18,py+Math.sin(pAngle)*18);
+
+    // Calculate angles
+    const inscribed=Math.abs(angleBetween(pa1,pa2))*180/Math.PI;
+    let centralDeg=Math.abs(aA-aB)*180/Math.PI;
+    if(centralDeg>180) centralDeg=360-centralDeg;
+
+    document.getElementById('inscribedAngle').textContent=Math.round(inscribed)+'°';
+    document.getElementById('centralAngle').textContent=Math.round(centralDeg)+'°';
+    const r2=centralDeg/inscribed;
+    document.getElementById('ratioVal').textContent=isFinite(r2)?r2.toFixed(2):'—';
+  }
+
+  function angleBetween(a,b){
+    let d=b-a;
+    while(d< -Math.PI) d+=TAU;
+    while(d>  Math.PI) d-=TAU;
+    return d;
+  }
+
+  function animStep(){
+    pAngle+=0.012;
+    // Keep P between aB+0.1 and aA-0.1 (on the major arc)
+    const lo=aB+0.15, hi=aA-0.15;
+    if(pAngle<lo||pAngle>hi){ pAngle=lo; }
+    drawAnim();
+    if(animRunning) animId=requestAnimationFrame(animStep);
+  }
+
+  document.getElementById('animBtn').addEventListener('click',()=>{
+    animRunning=!animRunning;
+    document.getElementById('animBtn').textContent=animRunning?'⏸ 暫停動畫':'▶ 繼續動畫';
+    if(animRunning) animId=requestAnimationFrame(animStep);
+  });
+  document.getElementById('resetAnimBtn').addEventListener('click',()=>{
+    pAngle=aB+0.2; animRunning=true;
+    document.getElementById('animBtn').textContent='⏸ 暫停動畫';
+    if(!animId) animId=requestAnimationFrame(animStep);
+  });
+
+  // ---- Verify canvas (Phase 3) ----
+  const cvV=document.getElementById('cvVerify');
+  const ctxV=cvV.getContext('2d');
+  let circleV={cx:0,cy:0,r:0};
+  let vPoints={ a:Math.PI*1.6, b:Math.PI*0.2, p:Math.PI*0.85 };
+  let dragging=null, dragOffset={x:0,y:0};
+
+  function resizeV(){
+    const dpr=window.devicePixelRatio||1;
+    const W=cvV.parentElement.getBoundingClientRect().width;
+    const H=380;
+    cvV.width=W*dpr; cvV.height=H*dpr; cvV.style.width=W+'px'; cvV.style.height=H+'px';
+    ctxV.resetTransform(); ctxV.scale(dpr,dpr);
+    circleV={cx:W/2,cy:H/2,r:Math.min(W,H)*0.34};
+    drawVerify();
+  }
+
+  function drawVerify(){
+    const {cx,cy,r}=circleV;
+    const dpr=window.devicePixelRatio||1;
+    const W=cvV.width/dpr,H=cvV.height/dpr;
+    ctxV.clearRect(0,0,W,H);
+
+    ctxV.beginPath(); ctxV.arc(cx,cy,r,0,TAU);
+    ctxV.strokeStyle='#334155'; ctxV.lineWidth=2.5; ctxV.stroke();
+
+    const ax=cx+r*Math.cos(vPoints.a),ay=cy+r*Math.sin(vPoints.a);
+    const bx=cx+r*Math.cos(vPoints.b),by=cy+r*Math.sin(vPoints.b);
+    const px=cx+r*Math.cos(vPoints.p),py=cy+r*Math.sin(vPoints.p);
+
+    // Central angle
+    ctxV.beginPath(); ctxV.moveTo(cx,cy); ctxV.lineTo(ax,ay); ctxV.moveTo(cx,cy); ctxV.lineTo(bx,by);
+    ctxV.strokeStyle='#fb923c66'; ctxV.lineWidth=2; ctxV.setLineDash([4,4]); ctxV.stroke(); ctxV.setLineDash([]);
+    let ca=vPoints.a, cb=vPoints.b; if(ca>cb)[ca,cb]=[cb,ca];
+    ctxV.beginPath(); ctxV.arc(cx,cy,r*0.28,ca,cb);
+    ctxV.strokeStyle='#fb923c'; ctxV.lineWidth=3; ctxV.stroke();
+
+    // Inscribed lines
+    ctxV.beginPath(); ctxV.moveTo(px,py); ctxV.lineTo(ax,ay); ctxV.moveTo(px,py); ctxV.lineTo(bx,by);
+    ctxV.strokeStyle='#22d3ee'; ctxV.lineWidth=2.5; ctxV.stroke();
+
+    const pa1=Math.atan2(ay-py,ax-px), pa2=Math.atan2(by-py,bx-px);
+    ctxV.beginPath(); ctxV.arc(px,py,r*0.12,Math.min(pa1,pa2),Math.max(pa1,pa2));
+    ctxV.strokeStyle='#22d3ee'; ctxV.lineWidth=2; ctxV.stroke();
+
+    // Draw dots
+    function dot(x,y,col,lbl,ang){
+      ctxV.beginPath(); ctxV.arc(x,y,8,0,TAU); ctxV.fillStyle=col; ctxV.fill();
+      ctxV.strokeStyle='#0f172a'; ctxV.lineWidth=2; ctxV.stroke();
+      ctxV.fillStyle=col; ctxV.font='bold 14px system-ui'; ctxV.textAlign='center';
+      ctxV.fillText(lbl,x+Math.cos(ang)*18,y+Math.sin(ang)*18);
+    }
+    ctxV.beginPath(); ctxV.arc(cx,cy,5,0,TAU); ctxV.fillStyle='#fb923c'; ctxV.fill();
+    ctxV.fillStyle='#fb923c'; ctxV.font='bold 13px system-ui'; ctxV.textAlign='left';
+    ctxV.fillText('O',cx+8,cy-4);
+    dot(ax,ay,'#818cf8','A',vPoints.a);
+    dot(bx,by,'#818cf8','B',vPoints.b);
+    dot(px,py,'#22d3ee','P',vPoints.p);
+
+    // Drag hint
+    ctxV.fillStyle='#475569'; ctxV.font='12px system-ui'; ctxV.textAlign='center';
+    ctxV.fillText('拖動圓上的點',cx,H-10);
+
+    const inscribed=Math.abs(angleBetween(pa1,pa2))*180/Math.PI;
+    let centralDeg=Math.abs(vPoints.a-vPoints.b)*180/Math.PI;
+    if(centralDeg>180) centralDeg=360-centralDeg;
+    document.getElementById('vInscribed').textContent=Math.round(inscribed)+'°';
+    document.getElementById('vCentral').textContent=Math.round(centralDeg)+'°';
+    const rv=centralDeg/inscribed;
+    document.getElementById('vRatio').textContent=isFinite(rv)?rv.toFixed(2):'—';
+  }
+
+  function ptFromEvent(e){
+    const rect=cvV.getBoundingClientRect();
+    const scl=cvV.width/(window.devicePixelRatio*rect.width);
+    const x=(e.clientX-rect.left), y=(e.clientY-rect.top);
+    return {x,y};
+  }
+  function hitRadius(pt,angle){
+    const {cx,cy,r}=circleV;
+    const px2=cx+r*Math.cos(angle), py2=cy+r*Math.sin(angle);
+    return Math.hypot(pt.x-px2,pt.y-py2)<22;
+  }
+  cvV.addEventListener('pointerdown',e=>{
+    const pt=ptFromEvent(e);
+    if(hitRadius(pt,vPoints.p)) dragging='p';
+    else if(hitRadius(pt,vPoints.a)) dragging='a';
+    else if(hitRadius(pt,vPoints.b)) dragging='b';
+    if(dragging) cvV.setPointerCapture(e.pointerId);
+  });
+  cvV.addEventListener('pointermove',e=>{
+    if(!dragging) return;
+    const pt=ptFromEvent(e);
+    const {cx,cy}=circleV;
+    vPoints[dragging]=Math.atan2(pt.y-cy,pt.x-cx);
+    drawVerify();
+  });
+  cvV.addEventListener('pointerup',()=>{ dragging=null; });
+
+  // Phase switching
+  let unlockedPhase=1;
+  window.switchPhase=function(n){
+    if(n>unlockedPhase+1 && n>2) return toast('請先完成上一步！');
+    if(n>unlockedPhase) unlockedPhase=n;
+    document.querySelectorAll('.phase').forEach(p=>p.classList.remove('active'));
+    document.getElementById('phase'+n).classList.add('active');
+    document.querySelectorAll('.ptab').forEach((t,i)=>{
+      t.classList.toggle('active',i===n-1);
+    });
+    document.getElementById('progFill').style.width=(n/4*100)+'%';
+    if(n===3){ setTimeout(resizeV,100); }
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+
+  function toast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),3000);
+  }
+
+  window.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(resizeA,100);
+    animId=requestAnimationFrame(animStep);
+  });
+  window.addEventListener('resize',()=>{ resizeA(); if(document.getElementById('phase3').classList.contains('active')) resizeV(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Unit 2b｜車輪滾動：同轉角，大輪走得更遠？</title>
+<style>
+:root{--bg:#f8fafc;--panel:#fff;--text:#1e293b;--muted:#64748b;--line:#e2e8f0;--accent:#f59e0b;--blue:#3b82f6;--good:#10b981;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans TC","PingFang TC",sans-serif;padding-top:64px;}
+header.topbar{position:fixed;top:0;left:0;right:0;height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;z-index:9999;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.brand{font-weight:800;color:var(--accent);font-size:1.1rem;margin-right:auto;}
+.wrap{max-width:1000px;margin:0 auto;padding:16px 20px;}
+.card{background:#fff;border:2px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+input[type=range]{width:100%;height:10px;-webkit-appearance:none;appearance:none;background:#e2e8f0;border-radius:5px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.2);}
+.val-big{font-size:2rem;font-weight:800;font-family:monospace;}
+.cmp-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:600px){.cmp-row{grid-template-columns:1fr;}}
+.wheel-card{border-radius:12px;padding:16px;text-align:center;}
+.small-card{background:#eff6ff;border:2px solid #93c5fd;}
+.large-card{background:#fff7ed;border:2px solid #fcd34d;}
+canvas#scene{display:block;width:100%;border-radius:12px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(15,23,42,.9);color:#fff;padding:12px 22px;border-radius:10px;font-size:15px;font-weight:600;opacity:0;transition:all .3s;z-index:500;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+button.ctrl-btn{padding:10px 20px;border:2px solid var(--accent);background:var(--accent);color:#fff;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;}
+button.ctrl-btn:hover{filter:brightness(1.1);}
+button.ctrl-btn.secondary{background:#fff;color:var(--accent);}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <span class="brand">🚗 Unit 2b｜車輪滾動</span>
+  <span style="font-size:13px;color:var(--muted);">同轉角，大輪走得更遠？</span>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2 style="margin:0 0 6px;font-size:20px;">🛞 情境：大輪 vs 小輪</h2>
+    <p style="color:var(--muted);font-size:14px;margin:0 0 12px;">同一輛車的前後輪半徑不同（或是大卡車和小汽車的輪子），轉動<b>相同的角度</b>，輪子在地面上滾過的距離會一樣嗎？</p>
+    <div style="background:#fffbeb;border-left:4px solid var(--accent);border-radius:8px;padding:12px 16px;font-size:14px;color:#92400e;line-height:1.7;">
+      📌 <b>探究問題：</b>圓心角（轉角）相同，半徑越大，滾過的距離也越大嗎？是什麼倍數關係？
+    </div>
+  </div>
+
+  <!-- Animation scene -->
+  <div class="card" style="padding:16px;">
+    <canvas id="scene" height="380"></canvas>
+
+    <div style="margin-top:14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <span style="font-size:14px;font-weight:700;color:var(--muted);">🔄 旋轉角度</span>
+        <input type="range" id="slAngle" min="0" max="720" value="0" step="5" style="flex:1;">
+        <span class="val-big" id="valAngle" style="color:var(--accent);min-width:80px;text-align:right;">0°</span>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="ctrl-btn" id="playBtn">▶ 播放動畫</button>
+        <button class="ctrl-btn secondary" id="resetBtn">↩ 重置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live comparison -->
+  <div class="cmp-row">
+    <div class="wheel-card small-card">
+      <div style="font-size:13px;font-weight:700;color:#1d4ed8;margin-bottom:6px;">🔵 小輪 (r = 0.4m)</div>
+      <div style="font-size:13px;color:var(--muted);">滾過距離</div>
+      <div class="val-big" id="distSmall" style="color:#2563eb;">0.00 m</div>
+      <div style="font-size:12px;color:#3b82f6;margin-top:4px;">= 2π × 0.4 × (θ/360°)</div>
+    </div>
+    <div class="wheel-card large-card">
+      <div style="font-size:13px;font-weight:700;color:#b45309;margin-bottom:6px;">🟡 大輪 (r = 0.8m)</div>
+      <div style="font-size:13px;color:var(--muted);">滾過距離</div>
+      <div class="val-big" id="distLarge" style="color:#d97706;">0.00 m</div>
+      <div style="font-size:12px;color:#f59e0b;margin-top:4px;">= 2π × 0.8 × (θ/360°)</div>
+    </div>
+  </div>
+
+  <!-- Ratio insight -->
+  <div class="card" style="text-align:center;padding:18px;">
+    <div style="font-size:14px;color:var(--muted);margin-bottom:8px;">大輪距離 ÷ 小輪距離 =</div>
+    <div class="val-big" id="ratio" style="color:var(--good);font-size:2.4rem;">—</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:6px;">（= 大輪半徑 ÷ 小輪半徑 = 0.8 ÷ 0.4 = 2.0）</div>
+    <div id="insightBox" style="display:none;margin-top:14px;background:#f0fdf4;border:2px solid #34d399;border-radius:10px;padding:14px;font-size:15px;color:#065f46;line-height:1.8;">
+      🎉 不管轉多少度，大輪滾過的距離<b>永遠是小輪的 2 倍</b>！<br>
+      這正是因為半徑增加 1 倍，弧長也增加 1 倍。<br>
+      <b>弧長 ∝ 半徑</b>（正比關係！）<br>
+      <div style="background:#fff;border-radius:8px;padding:10px;margin-top:10px;font-weight:800;font-size:17px;color:#1e40af;border:2px solid #bfdbfe;">
+        L = 2πr × (θ / 360°)
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+  const TAU=Math.PI*2, DEG=Math.PI/180;
+  const rSmall=0.4, rLarge=0.8;
+  const SCALE=80; // px per metre
+  let animId=null, playing=false, currentAngle=0;
+
+  const canvas=document.getElementById('scene');
+  const ctx=canvas.getContext('2d');
+  const slAngle=document.getElementById('slAngle');
+  const valAngle=document.getElementById('valAngle');
+
+  function resize(){
+    const dpr=window.devicePixelRatio||1;
+    const W=canvas.parentElement.getBoundingClientRect().width-32;
+    const H=380;
+    canvas.width=W*dpr; canvas.height=H*dpr;
+    canvas.style.width=W+'px'; canvas.style.height=H+'px';
+    ctx.resetTransform(); ctx.scale(dpr,dpr);
+    draw(currentAngle);
+  }
+
+  function draw(angleDeg){
+    const dpr=window.devicePixelRatio||1;
+    const W=canvas.width/dpr, H=canvas.height/dpr;
+    const divY=H/2;           // y=190: divider between upper and lower tracks
+    const ARROW_H=32;         // height of arrow zone below each ground line
+    const groundTop=divY-ARROW_H;  // upper ground line y (= 158)
+    const groundBot=H-ARROW_H;     // lower ground line y (= 348)
+
+    ctx.clearRect(0,0,W,H);
+
+    // Upper track: sky area + road area
+    ctx.fillStyle='#eff6ff'; ctx.fillRect(0,0,W,groundTop);
+    ctx.fillStyle='#dbeafe'; ctx.fillRect(0,groundTop,W,divY-groundTop);
+
+    // Lower track: sky area + road area
+    ctx.fillStyle='#fff7ed'; ctx.fillRect(0,divY,W,groundBot-divY);
+    ctx.fillStyle='#fde8c8'; ctx.fillRect(0,groundBot,W,H-groundBot);
+
+    // Ground lines
+    ctx.strokeStyle='#94a3b8'; ctx.lineWidth=3; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(0,groundTop); ctx.lineTo(W,groundTop); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,groundBot); ctx.lineTo(W,groundBot); ctx.stroke();
+
+    // Divider line
+    ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(0,divY); ctx.lineTo(W,divY); ctx.stroke();
+
+    const angleRad=angleDeg*DEG;
+    const startX=60; // both wheels start at same x
+
+    const sRpx=rSmall*SCALE;           // 32 px
+    const sDistPx=sRpx*angleRad;
+    const sX=startX+sDistPx;
+
+    const lRpx=rLarge*SCALE;           // 64 px
+    const lDistPx=lRpx*angleRad;
+    const lX=startX+lDistPx;
+
+    // Small wheel — clipped to upper half
+    ctx.save();
+    ctx.beginPath(); ctx.rect(0,0,W,divY); ctx.clip();
+    drawWheel(ctx,sX,groundTop-sRpx,sRpx,'#3b82f6',angleRad);
+    ctx.restore();
+
+    // Large wheel — clipped to lower half
+    ctx.save();
+    ctx.beginPath(); ctx.rect(0,divY,W,divY); ctx.clip();
+    drawWheel(ctx,lX,groundBot-lRpx,lRpx,'#f59e0b',angleRad);
+    ctx.restore();
+
+    // Track labels
+    ctx.font='bold 12px system-ui'; ctx.textAlign='left';
+    ctx.fillStyle='#1d4ed8'; ctx.fillText('🔵 小輪  r = 0.4 m', 8, 16);
+    ctx.fillStyle='#92400e'; ctx.fillText('🟡 大輪  r = 0.8 m', 8, divY+16);
+
+    // Distance arrows (below each ground line)
+    const arrowYTop=groundTop+20;
+    const arrowYBot=groundBot+20;
+    drawDist(ctx,startX,arrowYTop,sDistPx,'#1d4ed8',
+             '小輪: '+(rSmall*TAU*(angleDeg/360)).toFixed(2)+' m');
+    drawDist(ctx,startX,arrowYBot,lDistPx,'#b45309',
+             '大輪: '+(rLarge*TAU*(angleDeg/360)).toFixed(2)+' m');
+
+    // Update stats
+    const dSmall=rSmall*TAU*(angleDeg/360);
+    const dLarge=rLarge*TAU*(angleDeg/360);
+    document.getElementById('distSmall').textContent=dSmall.toFixed(2)+' m';
+    document.getElementById('distLarge').textContent=dLarge.toFixed(2)+' m';
+    valAngle.textContent=angleDeg+'°';
+
+    const rat=angleDeg>0?(dLarge/dSmall).toFixed(2):'—';
+    document.getElementById('ratio').textContent=rat;
+    if(angleDeg>=180) document.getElementById('insightBox').style.display='block';
+  }
+
+  function drawWheel(ctx,cx,cy,r,col,rotAngle){
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,TAU);
+    ctx.fillStyle=col+'22'; ctx.fill();
+    ctx.strokeStyle=col; ctx.lineWidth=4; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,r*0.18,0,TAU);
+    ctx.fillStyle=col; ctx.fill();
+    for(let i=0;i<6;i++){
+      const a=rotAngle+i*(Math.PI/3);
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.lineTo(cx+r*0.85*Math.cos(a),cy+r*0.85*Math.sin(a));
+      ctx.strokeStyle=col+'99'; ctx.lineWidth=2; ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.arc(cx+r*Math.cos(Math.PI/2+rotAngle),cy+r*Math.sin(Math.PI/2+rotAngle),5,0,TAU);
+    ctx.fillStyle=col; ctx.fill();
+  }
+
+  function drawDist(ctx,x0,y,dist,col,label){
+    if(dist<1) return;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x0,y); ctx.lineTo(x0+dist,y);
+    ctx.strokeStyle=col; ctx.lineWidth=3; ctx.stroke();
+    // arrowhead
+    ctx.beginPath();
+    ctx.moveTo(x0+dist,y);
+    ctx.lineTo(x0+dist-8,y-5);
+    ctx.lineTo(x0+dist-8,y+5);
+    ctx.fillStyle=col; ctx.fill();
+    // label above arrow line
+    ctx.font='bold 11px system-ui'; ctx.fillStyle=col; ctx.textAlign='left';
+    ctx.fillText(label,x0+4,y-5);
+  }
+
+  slAngle.addEventListener('input',()=>{
+    currentAngle=parseInt(slAngle.value);
+    draw(currentAngle);
+  });
+
+  document.getElementById('playBtn').addEventListener('click',()=>{
+    if(playing){
+      cancelAnimationFrame(animId); playing=false;
+      document.getElementById('playBtn').textContent='▶ 播放動畫';
+      return;
+    }
+    playing=true;
+    document.getElementById('playBtn').textContent='⏸ 暫停';
+    if(currentAngle>=720){ currentAngle=0; slAngle.value=0; }
+    function step(){
+      currentAngle=Math.min(currentAngle+3,720);
+      slAngle.value=currentAngle;
+      draw(currentAngle);
+      if(currentAngle<720 && playing) animId=requestAnimationFrame(step);
+      else { playing=false; document.getElementById('playBtn').textContent='▶ 再看一次'; }
+    }
+    animId=requestAnimationFrame(step);
+  });
+
+  document.getElementById('resetBtn').addEventListener('click',()=>{
+    cancelAnimationFrame(animId); playing=false;
+    currentAngle=0; slAngle.value=0;
+    document.getElementById('playBtn').textContent='▶ 播放動畫';
+    document.getElementById('insightBox').style.display='none';
+    draw(0);
+  });
+
+  window.addEventListener('resize',resize);
+  resize();
+})();
+</script>
+</body>
+</html>

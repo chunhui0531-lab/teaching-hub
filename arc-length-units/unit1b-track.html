@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Unit 1b｜圓形操場：圓心角 × 半徑 → 弧長</title>
+<style>
+:root{
+  --bg:#f1f5f9;--panel:#fff;--text:#1e293b;--muted:#64748b;
+  --line:#e2e8f0;--accent:#10b981;--bad:#ef4444;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:system-ui,-apple-system,"Noto Sans TC","PingFang TC",sans-serif;
+  padding-top:64px;font-size:16px;}
+header.topbar{position:fixed;top:0;left:0;right:0;height:64px;background:#fff;
+  border-bottom:1px solid var(--line);display:flex;align-items:center;
+  padding:0 20px;z-index:9999;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.brand{font-weight:800;color:var(--accent);font-size:1.1rem;margin-right:auto;}
+.wrap{max-width:1200px;margin:0 auto;padding:20px;}
+.card{background:#fff;border:2px solid var(--line);border-radius:16px;
+  padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+h2{margin:0 0 6px;font-size:21px;color:#0f172a;}
+.sub{color:var(--muted);font-size:14px;margin:0 0 14px;}
+.main-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:20px;align-items:start;}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr;}}
+canvas{display:block;width:100%;border-radius:12px;}
+/* slider */
+.ctrl-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.ctrl-label{font-size:14px;font-weight:700;color:#475569;white-space:nowrap;}
+input[type=range]{flex:1;min-width:100px;height:8px;-webkit-appearance:none;appearance:none;
+  background:#ddd;border-radius:4px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;
+  border-radius:50%;background:#8b5cf6;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);}
+.theta-badge{background:#8b5cf6;color:#fff;padding:3px 11px;border-radius:20px;
+  font-weight:800;font-size:15px;min-width:62px;text-align:center;}
+.btn-anim{padding:6px 14px;border:2px solid var(--accent);border-radius:8px;
+  background:#fff;font-weight:700;font-size:13px;cursor:pointer;color:var(--accent);transition:all .15s;}
+.btn-anim.on{background:var(--accent);color:#fff;}
+/* formula box */
+.fbox{background:linear-gradient(135deg,#f0f9ff,#dbeafe);border:2px solid #93c5fd;
+  border-radius:12px;padding:14px 18px;margin-bottom:14px;text-align:center;}
+.fmain{font-size:19px;font-weight:900;letter-spacing:.5px;}
+.fL{color:#059669;}.fTheta{color:#7c3aed;}.fR{color:#0369a1;}
+/* table */
+table{width:100%;border-collapse:collapse;font-size:14px;}
+th{background:#f8fafc;padding:8px 5px;font-weight:700;color:var(--muted);
+  border-bottom:2px solid var(--line);text-align:center;}
+td{padding:7px 5px;border-bottom:1px solid var(--line);text-align:center;font-size:14px;}
+td input[type=number]{width:68px;padding:4px 5px;border:1.5px solid #cbd5e1;
+  border-radius:6px;font-size:14px;text-align:center;}
+tr.done td{background:#f0fdf4;}
+/* progress */
+.prog-bar{height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,#10b981,#059669);
+  border-radius:4px;transition:width .4s;}
+/* conclusion */
+.conc-box{display:none;background:linear-gradient(135deg,#ecfdf5,#d1fae5);
+  border:2px solid #34d399;border-radius:14px;padding:18px;margin-top:14px;}
+.formula-display{background:#fff;border-radius:10px;padding:11px;
+  text-align:center;font-size:19px;font-weight:900;color:#065f46;
+  margin:10px 0;border:2px solid #6ee7b7;}
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:rgba(15,23,42,.92);color:#fff;padding:11px 22px;border-radius:10px;
+  font-size:15px;font-weight:600;opacity:0;transition:all .3s;z-index:9000;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <span class="brand">🏟 Unit 1b｜圓形操場俯視圖</span>
+  <span style="font-size:13px;color:var(--muted);">圓心角 × 半徑 → 弧長</span>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2>🎯 情境：圓形操場俯視圖</h2>
+    <p class="sub">4條同心圓跑道，共用同一個圓心。從圓心畫出兩條半徑，夾角就是「圓心角 θ」。</p>
+    <div style="background:#f5f3ff;border-left:4px solid #8b5cf6;border-radius:8px;
+        padding:12px 16px;font-size:15px;color:#3730a3;line-height:1.8;">
+      📌 <b>探究問題：</b>相同的圓心角，<b>外圈（半徑大）</b>的弧長 vs <b>內圈（半徑小）</b>的弧長，差多少？它們是什麼比例關係？
+    </div>
+  </div>
+
+  <div class="main-grid">
+
+    <!-- Left: canvas -->
+    <div>
+      <div class="card" style="padding:16px;">
+        <div class="ctrl-row">
+          <span class="ctrl-label">圓心角 <span class="fTheta" style="font-size:15px;">θ</span></span>
+          <input type="range" id="slAngle" min="0" max="360" value="95" step="1">
+          <span class="theta-badge" id="valAngle">95°</span>
+          <button class="btn-anim" id="btnAnim">▶ 跑者動畫</button>
+        </div>
+        <canvas id="trackCanvas"></canvas>
+        <div style="font-size:12px;color:var(--muted);text-align:center;margin-top:8px;">
+          虛線 = 半徑（從圓心出發）　粗弧段 = 圓心角對應弧長　圓點 = 跑者位置
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: formula + table -->
+    <div>
+      <div class="card">
+
+        <!-- Formula -->
+        <div class="fbox">
+          <div style="font-size:12px;color:#64748b;margin-bottom:5px;">弧長公式（核心）</div>
+          <div class="fmain">
+            <span class="fL">L</span> =
+            <span style="background:#f3e8ff;border-radius:4px;padding:1px 5px;">
+              <span class="fTheta">θ</span> ÷ 360
+            </span>
+            × 2π ×
+            <span style="background:#e0f2fe;border-radius:4px;padding:1px 5px;">
+              <span class="fR">r</span>
+            </span>
+          </div>
+          <div style="font-size:12px;color:#64748b;margin-top:7px;display:flex;justify-content:center;gap:16px;">
+            <span><span class="fTheta" style="font-weight:700;">θ</span> = 圓心角（度）</span>
+            <span><span class="fR" style="font-weight:700;">r</span> = 半徑（公尺）</span>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <b style="font-size:15px;">📊 弧長記錄表</b>
+          <div class="prog-bar" style="width:110px;"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 10px;">
+          觀察圖中標示的弧長數值，填入「你的答案」欄，再按「核對答案」：
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>跑道</th>
+              <th>半徑 <span class="fR">r</span></th>
+              <th>弧長 <span class="fL">L</span></th>
+              <th>你的答案</th>
+            </tr>
+          </thead>
+          <tbody id="recordTable">
+            <tr data-lane="0">
+              <td><span style="color:#ef4444;font-weight:700;">第1道</span></td>
+              <td style="color:#0369a1;font-weight:700;">36.8 m</td>
+              <td id="ans0" style="color:#059669;font-weight:700;">—</td>
+              <td><input type="number" id="inp0" placeholder="?" min="0" step="0.1"></td>
+            </tr>
+            <tr data-lane="1">
+              <td><span style="color:#f97316;font-weight:700;">第2道</span></td>
+              <td style="color:#0369a1;font-weight:700;">44.0 m</td>
+              <td id="ans1" style="color:#059669;font-weight:700;">—</td>
+              <td><input type="number" id="inp1" placeholder="?" min="0" step="0.1"></td>
+            </tr>
+            <tr data-lane="2">
+              <td><span style="color:#ca8a04;font-weight:700;">第3道</span></td>
+              <td style="color:#0369a1;font-weight:700;">51.2 m</td>
+              <td id="ans2" style="color:#059669;font-weight:700;">—</td>
+              <td><input type="number" id="inp2" placeholder="?" min="0" step="0.1"></td>
+            </tr>
+            <tr data-lane="3">
+              <td><span style="color:#10b981;font-weight:700;">第4道</span></td>
+              <td style="color:#0369a1;font-weight:700;">58.4 m</td>
+              <td id="ans3" style="color:#059669;font-weight:700;">—</td>
+              <td><input type="number" id="inp3" placeholder="?" min="0" step="0.1"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button id="checkBtn" style="margin-top:12px;width:100%;padding:10px;background:var(--accent);
+            color:#fff;border:none;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;">
+          ✓ 核對答案
+        </button>
+        <button id="revealBtn" style="margin-top:7px;width:100%;padding:8px;background:#f8fafc;
+            color:#475569;border:2px solid var(--line);border-radius:10px;
+            font-weight:700;font-size:14px;cursor:pointer;">
+          👁 顯示正確答案
+        </button>
+
+        <div class="conc-box" id="concBox">
+          <b style="color:#065f46;font-size:15px;">🎉 你發現了什麼？</b>
+          <p style="color:#166534;font-size:14px;line-height:1.8;margin:8px 0;">
+            弧長和半徑成<b>正比</b>！<br>
+            相同圓心角，半徑增加1倍 → 弧長也增加1倍。<br>
+            這就是為什麼外道選手必須從不同起跑線出發！
+          </p>
+          <div class="formula-display">L = (θ ÷ 360°) × 2πr</div>
+          <p style="font-size:13px;color:#047857;margin:0;">
+            💡 試試看：第4道半徑 ÷ 第1道半徑 = 58.4 ÷ 36.8 ≈ 1.587，弧長比值是否也相同？
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const TAU = Math.PI * 2;
+const DEG = Math.PI / 180;
+const RADII  = [36.8, 44.0, 51.2, 58.4];
+const COLORS = ['#ef4444','#f97316','#eab308','#10b981'];
+const COLORS_DARK = ['#b91c1c','#c2410c','#a16207','#047857'];
+
+const canvas  = document.getElementById('trackCanvas');
+const ctx     = canvas.getContext('2d');
+const slAngle = document.getElementById('slAngle');
+const valAngle= document.getElementById('valAngle');
+
+// --- animation state ---
+let animOn = false, animRAF = null, lastTime = null;
+let runnerFrac = 0, runnerDir = 1; // frac: 0..1 along the arc
+const ANGULAR_SPEED_DEG = 35; // degrees per second (angular)
+
+// ── resize ──────────────────────────────────────────────
+function resize(){
+  const dpr = window.devicePixelRatio || 1;
+  const cw = canvas.parentElement.getBoundingClientRect().width - 32;
+  const ch = cw; // square → full circle visible
+  canvas.width  = cw * dpr;
+  canvas.height = ch * dpr;
+  canvas.style.width  = cw + 'px';
+  canvas.style.height = ch + 'px';
+  ctx.resetTransform();
+  ctx.scale(dpr, dpr);
+  draw();
+}
+
+// ── helpers ─────────────────────────────────────────────
+function getTheta(){ return parseFloat(slAngle.value); }
+
+function arcLen(r, deg){ return 2 * Math.PI * r * (deg / 360); }
+
+function pillText(text, x, y, textColor, bgColor){
+  ctx.save();
+  ctx.font = 'bold 11px system-ui';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const tw = ctx.measureText(text).width;
+  const pw = tw + 8, ph = 16, pr = 5;
+  ctx.fillStyle = bgColor;
+  ctx.beginPath();
+  ctx.moveTo(x - pw/2 + pr, y - ph/2);
+  ctx.lineTo(x + pw/2 - pr, y - ph/2);
+  ctx.quadraticCurveTo(x + pw/2, y - ph/2, x + pw/2, y - ph/2 + pr);
+  ctx.lineTo(x + pw/2, y + ph/2 - pr);
+  ctx.quadraticCurveTo(x + pw/2, y + ph/2, x + pw/2 - pr, y + ph/2);
+  ctx.lineTo(x - pw/2 + pr, y + ph/2);
+  ctx.quadraticCurveTo(x - pw/2, y + ph/2, x - pw/2, y + ph/2 - pr);
+  ctx.lineTo(x - pw/2, y - ph/2 + pr);
+  ctx.quadraticCurveTo(x - pw/2, y - ph/2, x - pw/2 + pr, y - ph/2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = textColor;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+// ── main draw ────────────────────────────────────────────
+function draw(){
+  const theta  = getTheta();
+  valAngle.textContent = theta + '°';
+  updateTableAnswers(theta);
+
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.width / dpr;
+  const H = canvas.height / dpr;
+  ctx.clearRect(0, 0, W, H);
+
+  // background
+  const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W/2);
+  grad.addColorStop(0, '#1c3f1c');
+  grad.addColorStop(1, '#0f2010');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  const cx = W / 2, cy = H / 2;
+  const outerMaxR = RADII[3];
+  const scale = (Math.min(W, H) * 0.43) / outerMaxR;
+
+  const startA = -Math.PI / 2;           // top
+  const spanA  = theta * DEG;
+  const endA   = startA + spanA;
+
+  // inner circle boundary
+  const innerR = RADII[0] * scale * 0.80;
+
+  // ── 1. Full grey circle tracks (background) ──
+  for(let i = 0; i < RADII.length; i++){
+    const r = RADII[i] * scale;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, TAU);
+    ctx.strokeStyle = COLORS[i] + '30';
+    ctx.lineWidth = getLaneW(i, scale);
+    ctx.stroke();
+  }
+
+  // ── 2. Highlighted arc band for each lane ──
+  if(theta > 0){
+    for(let i = 0; i < RADII.length; i++){
+      const rOuter = RADII[i] * scale;
+      const rInner = i === 0 ? innerR : RADII[i-1] * scale;
+      const lw = rOuter - rInner;
+
+      // filled glow
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, rOuter, startA, endA);
+      ctx.arc(cx, cy, rInner, endA, startA, true);
+      ctx.closePath();
+      ctx.fillStyle = COLORS[i] + '28';
+      ctx.fill();
+      ctx.restore();
+
+      // bright arc stroke (mid of lane)
+      const rMid = (rOuter + rInner) / 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rMid, startA, endA);
+      ctx.strokeStyle = COLORS[i];
+      ctx.lineWidth = lw * 0.55;
+      ctx.globalAlpha = 0.9;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // hard edge arcs
+      [rOuter, rInner].forEach(r => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, startA, endA);
+        ctx.strokeStyle = COLORS[i];
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = 0.6;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      });
+    }
+  }
+
+  // ── 3. Two dashed radius lines ──
+  const lineMaxR = RADII[3] * scale + 22;
+  const radLineAngles = theta > 0 ? [startA, endA] : [startA];
+  const radLineStyles = ['rgba(255,255,255,0.85)', 'rgba(255,220,60,0.9)'];
+
+  radLineAngles.forEach((a, idx) => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + lineMaxR * Math.cos(a), cy + lineMaxR * Math.sin(a));
+    ctx.strokeStyle = radLineStyles[idx] || radLineStyles[0];
+    ctx.setLineDash([7, 5]);
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // ── 4. θ arc indicator (near center) ──
+  if(theta > 0 && theta < 360){
+    const thetaR = innerR * 0.52;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, thetaR, startA, endA);
+    ctx.strokeStyle = '#a78bfa';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([4, 3]);
+    ctx.stroke();
+    ctx.restore();
+
+    // arrowhead at endA
+    if(theta > 5){
+      const ax = cx + thetaR * Math.cos(endA);
+      const ay = cy + thetaR * Math.sin(endA);
+      const perpA = endA + Math.PI/2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(ax - 6*Math.cos(perpA) - 4*Math.cos(endA),
+                 ay - 6*Math.sin(perpA) - 4*Math.sin(endA));
+      ctx.lineTo(ax + 6*Math.cos(perpA) - 4*Math.cos(endA),
+                 ay + 6*Math.sin(perpA) - 4*Math.sin(endA));
+      ctx.closePath();
+      ctx.fillStyle = '#a78bfa';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // θ value label
+    const midA  = startA + spanA / 2;
+    const labelR = thetaR + 18;
+    const lx = cx + labelR * Math.cos(midA);
+    const ly = cy + labelR * Math.sin(midA);
+    ctx.save();
+    ctx.font = 'bold 13px system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const txt = 'θ=' + theta + '°';
+    const tw = ctx.measureText(txt).width + 8;
+    ctx.fillStyle = 'rgba(30,20,60,0.75)';
+    ctx.beginPath();
+    ctx.roundRect(lx - tw/2, ly - 9, tw, 18, 4);
+    ctx.fill();
+    ctx.fillStyle = '#c4b5fd';
+    ctx.fillText(txt, lx, ly);
+    ctx.restore();
+  } else if(theta === 360){
+    // show θ=360° near center
+    ctx.save();
+    ctx.font = 'bold 13px system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#c4b5fd';
+    ctx.fillText('θ=360°', cx, cy - innerR * 0.55);
+    ctx.restore();
+  }
+
+  // ── 5. Radius labels (along first dashed line) ──
+  RADII.forEach((rad, i) => {
+    const rOuter = rad * scale;
+    const rInner = i === 0 ? innerR : RADII[i-1] * scale;
+    const rMid = (rOuter + rInner) / 2;
+    // place label slightly to the left of startA line
+    const labelA = startA - 0.12;
+    const lx = cx + rMid * Math.cos(labelA);
+    const ly = cy + rMid * Math.sin(labelA);
+    ctx.save();
+    ctx.font = 'bold 10px system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // small background
+    const txt = 'r=' + rad;
+    const tw = ctx.measureText(txt).width + 6;
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.beginPath();
+    ctx.roundRect(lx - tw/2, ly - 8, tw, 16, 3);
+    ctx.fill();
+    ctx.fillStyle = COLORS[i];
+    ctx.fillText(txt, lx, ly);
+    ctx.restore();
+  });
+
+  // ── 6. Arc length labels (on highlighted arcs) ──
+  if(theta > 0){
+    RADII.forEach((rad, i) => {
+      const len = arcLen(rad, theta);
+      const rOuter = rad * scale;
+      const rInner = i === 0 ? innerR : RADII[i-1] * scale;
+      const rMid = (rOuter + rInner) / 2;
+
+      // place at 60% along arc to avoid θ label overlap
+      const labelFrac = theta < 30 ? 0.85 : 0.6;
+      const midA = startA + spanA * labelFrac;
+      const lx = cx + rMid * Math.cos(midA);
+      const ly = cy + rMid * Math.sin(midA);
+      pillText(len.toFixed(1) + ' m', lx, ly, COLORS[i], 'rgba(0,0,0,0.72)');
+    });
+  }
+
+  // ── 7. Runners ──
+  if(theta > 0){
+    const runA = theta > 0
+      ? startA + spanA * runnerFrac
+      : startA;
+    RADII.forEach((rad, i) => {
+      const r = rad * scale;
+      const rx = cx + r * Math.cos(runA);
+      const ry = cy + r * Math.sin(runA);
+      // shadow
+      ctx.beginPath();
+      ctx.arc(rx, ry, 8, 0, TAU);
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fill();
+      // body
+      ctx.beginPath();
+      ctx.arc(rx, ry, 6.5, 0, TAU);
+      ctx.fillStyle = COLORS[i];
+      ctx.fill();
+      // white border
+      ctx.beginPath();
+      ctx.arc(rx, ry, 6.5, 0, TAU);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+    });
+  }
+
+  // ── 8. Center dot ──
+  ctx.beginPath();
+  ctx.arc(cx, cy, 5, 0, TAU);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3.5, 0, TAU);
+  ctx.fillStyle = '#334155';
+  ctx.fill();
+}
+
+function getLaneW(i, scale){
+  const rOuter = RADII[i] * scale;
+  const rInner = i === 0 ? RADII[0]*scale*0.80 : RADII[i-1]*scale;
+  return rOuter - rInner;
+}
+
+// ── animation loop ───────────────────────────────────────
+function animLoop(ts){
+  if(!animOn) return;
+  if(lastTime === null) lastTime = ts;
+  const dt = Math.min((ts - lastTime) / 1000, 0.05);
+  lastTime = ts;
+
+  const theta = getTheta();
+  if(theta > 0){
+    const fracSpeed = ANGULAR_SPEED_DEG / theta; // frac per sec
+    runnerFrac += fracSpeed * runnerDir * dt;
+    if(runnerFrac >= 1){ runnerFrac = 1; runnerDir = -1; }
+    if(runnerFrac <= 0){ runnerFrac = 0; runnerDir =  1; }
+  }
+  draw();
+  animRAF = requestAnimationFrame(animLoop);
+}
+
+document.getElementById('btnAnim').addEventListener('click', () => {
+  animOn = !animOn;
+  const btn = document.getElementById('btnAnim');
+  if(animOn){
+    btn.textContent = '⏸ 暫停'; btn.classList.add('on');
+    runnerFrac = 0; runnerDir = 1; lastTime = null;
+    animRAF = requestAnimationFrame(animLoop);
+  } else {
+    btn.textContent = '▶ 跑者動畫'; btn.classList.remove('on');
+    if(animRAF) cancelAnimationFrame(animRAF);
+    draw();
+  }
+});
+
+// ── slider ───────────────────────────────────────────────
+slAngle.addEventListener('input', () => {
+  if(!animOn) draw();
+  else {
+    valAngle.textContent = getTheta() + '°';
+    updateTableAnswers(getTheta());
+  }
+  // reset check state
+  [0,1,2,3].forEach(i => {
+    const inp = document.getElementById('inp' + i);
+    if(inp) inp.style.borderColor = '';
+    const row = document.querySelector(`tr[data-lane="${i}"]`);
+    if(row) row.classList.remove('done');
+  });
+  document.getElementById('concBox').style.display = 'none';
+});
+
+// ── table answers ─────────────────────────────────────────
+function updateTableAnswers(theta){
+  RADII.forEach((r, i) => {
+    const el = document.getElementById('ans' + i);
+    if(el) el.textContent = theta > 0 ? arcLen(r, theta).toFixed(1) + ' m' : '—';
+  });
+}
+
+// ── input recording ───────────────────────────────────────
+let recorded = [null, null, null, null];
+[0,1,2,3].forEach(i => {
+  document.getElementById('inp' + i).addEventListener('input', e => {
+    recorded[i] = parseFloat(e.target.value) || null;
+    updateProg();
+  });
+});
+
+function updateProg(){
+  const cnt = recorded.filter(v => v !== null).length;
+  document.getElementById('progFill').style.width = (cnt / 4 * 100) + '%';
+}
+
+// ── check ─────────────────────────────────────────────────
+document.getElementById('checkBtn').addEventListener('click', () => {
+  const theta = getTheta();
+  let allOk = true;
+  [0,1,2,3].forEach(i => {
+    const inp = document.getElementById('inp' + i);
+    const expected = arcLen(RADII[i], theta);
+    const val = parseFloat(inp.value);
+    const row = document.querySelector(`tr[data-lane="${i}"]`);
+    const ok = !isNaN(val) && Math.abs(val - expected) < Math.max(expected * 0.05, 0.5);
+    if(ok){
+      row.classList.add('done');
+      inp.style.borderColor = '#10b981';
+      recorded[i] = val;
+    } else {
+      allOk = false;
+      inp.style.borderColor = '#ef4444';
+      row.classList.remove('done');
+    }
+  });
+  updateProg();
+  if(allOk){
+    document.getElementById('concBox').style.display = 'block';
+    setTimeout(() => document.getElementById('concBox').scrollIntoView({behavior:'smooth'}), 300);
+    toast('🎉 全部正確！弧長與半徑成正比，你發現了！');
+  } else {
+    toast('📍 提示：L = (θ÷360) × 2π × r，把數字代入算算看！');
+  }
+});
+
+// ── reveal ────────────────────────────────────────────────
+document.getElementById('revealBtn').addEventListener('click', () => {
+  const theta = getTheta();
+  [0,1,2,3].forEach(i => {
+    const inp = document.getElementById('inp' + i);
+    inp.value = arcLen(RADII[i], theta).toFixed(1);
+    inp.style.borderColor = '#94a3b8';
+    recorded[i] = arcLen(RADII[i], theta);
+  });
+  updateProg();
+  toast('💡 正確答案已顯示，試著理解 L = (θ÷360)×2πr 的計算過程！');
+});
+
+// ── toast ─────────────────────────────────────────────────
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── init ──────────────────────────────────────────────────
+window.addEventListener('resize', resize);
+resize();
+
+})();
+</script>
+</body>
+</html>

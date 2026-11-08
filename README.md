@@ -9,6 +9,7 @@ https://chunhui0531-lab.github.io/teaching-hub/
 | `quake-small-energy/` | 小地震多，能量也多嗎？ | 會考題組：統計圖表 × 指數律 |
 | `quake-building-tilt/` | 震後大樓傾斜判定 | 會考題組：相似三角形（精簡版） |
 | `quake-building-tilt-advanced/` | 震後大樓傾斜判定（進階） | 會考題組：相似三角形 × 模型檢驗 |
+| `arc-length-units/` | 弧長與圓周角探究單元（5 個網頁） | 互動探究系列 |
 
 其他較早的作品放在各自的 repo 中，連結整理在目錄頁。
 
