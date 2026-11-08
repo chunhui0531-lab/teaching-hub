@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>震後大樓傾斜判定</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../assets/exam-sheet.css">
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+<style>
+.s-bld { fill: var(--accent-soft); stroke: var(--accent); }
+.s-ground { stroke: var(--ink); }
+.s-ref { stroke: var(--muted); }
+.s-plumb { stroke: var(--alert); }
+.s-plumb-t { fill: var(--alert); }
+.s-hl { stroke: var(--accent); }
+.grade td:first-child { font-family: var(--sans); font-weight: 500; }
+.formula { text-align: center; margin: 4px 0 8px; }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <header>
+    <span class="eyebrow">國中數學・會考題組（精簡版）・相似三角形 × 比例</span>
+    <h1>震後大樓傾斜判定</h1>
+    <p class="lead">閱讀下列資料，回答第 1、2 題。第 1 題為選擇題，第 2 題為非選擇題。</p>
+  </header>
+
+  <section class="src">
+    <div class="doc">
+      <p>2024 年 4 月 3 日花蓮地震後，花蓮市天王星大樓嚴重傾斜，各地技師依「災害後危險建築物緊急評估」為受損建物判定紅、黃單。評估項目中的「建築物傾斜」，以<b>傾斜率</b>判定等級：</p>
+      <div class="formula">$$\text{傾斜率 } S=\dfrac{\text{水平側移 } D}{\text{高度 } H}$$</div>
+    </div>
+    <div class="tbl">
+      <table class="grade">
+        <caption style="caption-side: top; font-family: var(--sans); font-size: 14px; color: var(--muted); padding-bottom: 4px;">表（一）建築物傾斜的判定等級</caption>
+        <thead><tr><th>等級</th><th>傾斜率 $S$</th></tr></thead>
+        <tbody>
+          <tr><td>甲級（輕微）</td><td>$S&lt;\dfrac{1}{60}$</td></tr>
+          <tr><td>乙級（中等）</td><td>$\dfrac{1}{60}\le S\le\dfrac{1}{30}$</td></tr>
+          <tr><td>丙級（嚴重）</td><td>$S&gt;\dfrac{1}{30}$</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="src">
+    <div class="doc">
+      <p>技師無法直接量到整棟大樓頂端的偏移，因此從外牆上某一點 $P$ 垂下一條鉛垂線，量出鉛垂線的長度 $h$，以及鉛垂線底端與牆腳的水平距離 $d$，如圖（一）。</p>
+    </div>
+    <figure class="narrow">
+      <svg viewBox="0 0 460 310" role="img" aria-label="圖一：傾斜大樓的側視圖，整棟高度 H、頂端水平側移 D，外牆 P 點垂下長 h 的鉛垂線，底端距牆腳 d" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif">
+        <polygon class="s-bld" points="100,270 220,270 270,70 150,70" stroke-width="1.8"/>
+        <line class="s-ground" x1="50" y1="270" x2="420" y2="270" stroke-width="2"/>
+        <line class="s-ref" x1="220" y1="270" x2="220" y2="70" stroke-width="1.2" stroke-dasharray="5,4"/>
+        <line class="s-ref" x1="220" y1="70" x2="270" y2="70" stroke-width="1.2" stroke-dasharray="5,4"/>
+        <line class="s-plumb" x1="235" y1="210" x2="235" y2="270" stroke-width="2"/>
+        <circle class="s-plumb-t" cx="235" cy="210" r="3.5"/>
+        <circle class="s-plumb-t" cx="235" cy="266" r="4"/>
+        <g class="s-text" font-size="15">
+          <text x="210" y="175" text-anchor="end">H</text>
+          <text x="245" y="58" text-anchor="middle">D</text>
+          <text x="244" y="206">P</text>
+          <text x="227" y="292" text-anchor="middle">d</text>
+        </g>
+        <g class="s-plumb-t" font-size="14">
+          <text x="244" y="245">h（鉛垂線）</text>
+        </g>
+        <text class="s-muted" x="330" y="300" font-size="12" text-anchor="middle">（傾斜程度已放大，圖形未依比例）</text>
+      </svg>
+    </figure>
+    <figcaption>圖（一）</figcaption>
+  </section>
+
+  <section class="src">
+    <div class="tbl">
+      <table>
+        <caption style="caption-side: top; font-family: var(--sans); font-size: 14px; color: var(--muted); padding-bottom: 4px;">表（二）兩棟大樓的量測結果</caption>
+        <thead><tr><th></th><th>大樓高度 $H$</th><th>鉛垂線長 $h$</th><th>水平距離 $d$</th></tr></thead>
+        <tbody>
+          <tr><th>甲大樓</th><td>45 公尺</td><td>1.5 公尺</td><td>2 公分</td></tr>
+          <tr><th>乙大樓</th><td>12 公尺</td><td>1.2 公尺</td><td>5 公分</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="talk">
+      <div class="say"><b>住戶</b><p>甲大樓比乙大樓高很多，頂端偏移的距離一定比較大，甲大樓應該比較危險才對！</p></div>
+    </div>
+  </section>
+
+  <!-- 第 1 題 -->
+  <section class="q" data-ans="A">
+    <div class="q-head"><b>1.</b><span class="stage">找元素・找關係・建系統</span><span class="kind">選擇題</span></div>
+    <p class="q-stem">根據表（一）與表（二），甲、乙兩棟大樓的傾斜等級分別為何？</p>
+    <div class="opts">
+      <button class="opt" id="q1A" data-k="A">(A) 甲大樓：甲級；乙大樓：丙級</button>
+      <button class="opt" id="q1B" data-k="B">(B) 甲大樓：乙級；乙大樓：乙級</button>
+      <button class="opt" id="q1C" data-k="C">(C) 甲大樓：丙級；乙大樓：甲級</button>
+      <button class="opt" id="q1D" data-k="D">(D) 甲大樓：甲級；乙大樓：乙級</button>
+    </div>
+    <p class="fb" aria-live="polite"></p>
+  </section>
+
+  <!-- 第 2 題 -->
+  <section class="q">
+    <div class="q-head"><b>2.</b><span class="stage">反駁說理・驗證有效性</span><span class="kind">非選擇題</span></div>
+    <p class="q-stem">請利用相似三角形，分別算出甲、乙兩棟大樓頂端的水平側移 $D$，並說明住戶的說法是否合理。</p>
+    <textarea id="a2" aria-label="第 2 題作答區" placeholder="寫出相似的理由、計算過程與判斷"></textarea>
+    <details class="key">
+      <summary>參考答案與評分規準</summary>
+      <div>
+        <ul>
+          <li><b>相似的理由：</b>鉛垂線、牆面與地面圍成的小三角形，和整棟大樓的高度、牆面與頂端側移圍成的大三角形，都有一個直角，且牆面與鉛垂方向的夾角相等，所以兩個三角形相似（AA），$\dfrac{D}{H}=\dfrac{d}{h}$。</li>
+          <li><b>甲大樓：</b>$\dfrac{d}{h}=\dfrac{2}{150}=\dfrac{1}{75}$，$D=45\times\dfrac{1}{75}=0.6$ 公尺，即 60 公分。</li>
+          <li><b>乙大樓：</b>$\dfrac{d}{h}=\dfrac{5}{120}=\dfrac{1}{24}$，$D=12\times\dfrac{1}{24}=0.5$ 公尺，即 50 公分。</li>
+          <li><b>判斷：</b>住戶說「甲大樓頂端偏移比較大」是對的（60 公分大於 50 公分），但「所以比較危險」不合理。傾斜等級看的是傾斜率 $\dfrac{D}{H}$，不是偏移量本身：甲大樓 $\dfrac{1}{75}&lt;\dfrac{1}{60}$ 屬於甲級（輕微），乙大樓 $\dfrac{1}{24}&gt;\dfrac{1}{30}$ 屬於丙級（嚴重）。</li>
+        </ul>
+        <div class="tbl"><table class="rubric">
+          <tr><th>得分</th><th>規準</th></tr>
+          <tr><td>2 分</td><td>正確算出 $D$ 分別為 60 公分與 50 公分，並指出判定危險程度應比較傾斜率而不是偏移量</td></tr>
+          <tr><td>1 分</td><td>只正確算出兩個 $D$ 而沒有說明；或說明應比較傾斜率，但 $D$ 算錯（例如單位未換算）</td></tr>
+          <tr><td>0 分</td><td>同意住戶的說法，或沒有計算也沒有理由</td></tr>
+        </table></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="summary">
+    <h2>教師解析</h2>
+    <details class="key">
+      <summary>展開：答案、命題設計與陷阱分析</summary>
+      <div>
+        <p><b>答案：</b>1.（A）　2. 甲大樓 60 公分、乙大樓 50 公分，住戶的推論不合理，詳見參考答案</p>
+        <p><b>【參考來源】</b>判定等級引自臺北市「災害後危險建築物緊急評估明細表說明」：傾斜率以「水平側移除以高度」計算，甲級未滿 1/60、乙級 1/60 至 1/30、丙級超過 1/30。情境取自 2024 年 0403 花蓮地震後的勘災新聞。會考架構：題組（1 選擇＋1 非選擇），相似三角形結合分數比較。</p>
+        <div class="tbl"><table>
+          <tr><th>題號</th><th>建模歷程</th><th>學生要做的事</th><th>主要陷阱</th></tr>
+          <tr><td>1</td><td>找元素→找關係→建系統</td><td>看出鉛垂線小三角形與整棟大樓大三角形相似，所以 $S=\dfrac{d}{h}$，不需要整棟高度；換算單位後得 $\dfrac{1}{75}$、$\dfrac{1}{24}$，再對照表（一）</td><td>(D)：以為 $\dfrac{1}{24}&lt;\dfrac{1}{30}$（只比分母大小）；(C)：用頂端偏移或樓高判斷危險；(B)：公分、公尺未換算或分級界線讀錯</td></tr>
+          <tr><td>2</td><td>反駁說理→驗證有效性</td><td>用相似求出 $D$，驗證住戶「偏移較大」的前提為真，但「較危險」的結論不成立</td><td>算出 $D$ 後就同意住戶；忘記把 $d$ 的公分換成公尺</td></tr>
+        </table></div>
+        <p><b>【自我稽核】</b>甲：$2\div150=\dfrac{1}{75}$，$\dfrac{1}{75}&lt;\dfrac{1}{60}$ 甲級 ✓，$45\div75=0.6$ 公尺 ✓。乙：$5\div120=\dfrac{1}{24}$，$\dfrac{1}{24}&gt;\dfrac{1}{30}$ 丙級 ✓，$12\div24=0.5$ 公尺 ✓。圖（一）中小三角形（$h$、$d$）與大三角形（$H$、$D$）各有一直角且傾斜角相等，AA 相似 ✓。</p>
+      </div>
+    </details>
+  </section>
+</main>
+
+<script>
+document.querySelectorAll('.q[data-ans]').forEach(function (q) {
+  var ans = q.dataset.ans, fb = q.querySelector('.fb');
+  q.querySelectorAll('.opt').forEach(function (b) {
+    b.addEventListener('click', function () {
+      q.querySelectorAll('.opt').forEach(function (o) { o.classList.remove('right', 'wrong'); });
+      var ok = b.dataset.k === ans;
+      b.classList.add(ok ? 'right' : 'wrong');
+      fb.className = 'fb ' + (ok ? 'good' : 'bad');
+      fb.textContent = ok ? '答對了！甲大樓 1/75 屬甲級，乙大樓 1/24 屬丙級。' : '再想想：圖（一）的小三角形和大三角形相似，傾斜率可以直接用 d ÷ h 算，記得單位要一致。';
+    });
+  });
+});
+</script>
+</body>
+</html>

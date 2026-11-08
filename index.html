@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>數學互動教材總覽</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+:root{
+  --bg:#f4f6f8; --card:#fff; --ink:#1d232b; --muted:#5b6470; --line:#d9dde2;
+  --accent:#1f5f99; --accent-soft:#e8f0f8; --tag:#7a4fa0; --tag-soft:#f2ecf8;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#14181d; --card:#1b2027; --ink:#e6e9ee; --muted:#9aa4b1; --line:#343c47;
+    --accent:#6fa8dc; --accent-soft:#1f2b38; --tag:#c3a2e3; --tag-soft:#2a2333; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;line-height:1.7}
+.wrap{max-width:1000px;margin:0 auto;padding:36px 18px 60px}
+header h1{font-size:clamp(1.5rem,3.5vw,2.1rem);font-weight:900;margin:0}
+header p{color:var(--muted);margin:6px 0 0}
+h2{font-size:1.15rem;margin:36px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+a.card{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;color:inherit;text-decoration:none;min-height:44px}
+a.card:hover,a.card:focus-visible{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+.card b{font-size:1.05rem}
+.card span{color:var(--muted);font-size:.92rem}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
+.tags i{font-style:normal;font-size:.78rem;color:var(--tag);background:var(--tag-soft);padding:1px 8px;border-radius:4px}
+footer{margin-top:48px;color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>數學互動教材總覽</h1>
+    <p>新竹市香山高中國中部・數學科互動網頁與素養題組。點卡片即可開啟，手機、平板、電腦都能用。</p>
+  </header>
+
+  <h2>素養題組（會考題型）</h2>
+  <div class="grid">
+    <a class="card" href="quake-small-energy/"><b>小地震多，能量也多嗎？</b><span>統計圖表判讀結合指數律，反駁「次數多＝能量多」。</span><div class="tags"><i>統計圖表</i><i>指數律</i><i>1選＋1非選</i></div></a>
+    <a class="card" href="quake-building-tilt/"><b>震後大樓傾斜判定</b><span>以 0403 花蓮地震為情境，用鉛垂線與相似三角形判定傾斜等級。</span><div class="tags"><i>相似三角形</i><i>比例</i><i>精簡版</i></div></a>
+    <a class="card" href="quake-building-tilt-advanced/"><b>震後大樓傾斜判定（進階）</b><span>加入支架量測與樓層相對傾斜，檢驗政府紅黃單判定。</span><div class="tags"><i>相似三角形</i><i>模型檢驗</i><i>進階版</i></div></a>
+    <a class="card" href="https://chunhui0531-lab.github.io/caffeine-literacy-guide/"><b>便當鈉含量的數學</b><span>不等式與範圍推論，含分段提問、迷思回饋與評分規準。</span><div class="tags"><i>不等式</i><i>素養</i></div></a>
+  </div>
+
+  <h2>互動探究網頁</h2>
+  <div class="grid">
+    <a class="card" href="https://chunhui0531-lab.github.io/circle-angle-adventure/"><b>圓周角王國大冒險</b><span>九年級圓心角與圓周角闖關，含學習歷程紀錄。</span><div class="tags"><i>九年級</i><i>圓</i><i>闖關</i></div></a>
+    <a class="card" href="https://chunhui0531-lab.github.io/arc-explorer-v2/"><b>圓心角與弧長探究實驗</b><span>拖曳圓心角與半徑，觀察弧長的變化規律。</span><div class="tags"><i>九年級</i><i>圓</i><i>探究</i></div></a>
+    <a class="card" href="https://chunhui0531-lab.github.io/circle-test/"><b>伸縮曲尺找直徑</b><span>圓周角探索任務。</span><div class="tags"><i>九年級</i><i>圓周角</i></div></a>
+    <a class="card" href="buoyancy-sink/"><b>船沉了，浮力變大還是變小？</b><span>往盒中倒水觀察浮力變化，先預測再實驗，含教師自動演示模式。</span><div class="tags"><i>跨科：自然</i><i>浮力</i><i>預測→實驗</i></div></a>
+  </div>
+
+  <h2>課堂測驗與活動</h2>
+  <div class="grid">
+    <a class="card" href="https://chunhui0531-lab.github.io/2-1-Function/"><b>七年級數學・第一章線上測驗</b><span>章節線上測驗。</span><div class="tags"><i>七年級</i><i>測驗</i></div></a>
+    <a class="card" href="https://chunhui0531-lab.github.io/fashion-quiz/student.html"><b>快時尚健檢</b><span>課堂即時問答（學生端）。</span><div class="tags"><i>即時問答</i><i>素養</i></div></a>
+  </div>
+
+  <footer>本頁由 teaching-hub 維護。新增作品時，請一併更新本頁與 README.md。</footer>
+</div>
+</body>
+</html>

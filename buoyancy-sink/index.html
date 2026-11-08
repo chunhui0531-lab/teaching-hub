@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>船沉了，浮力變大還是變小？｜加水探究</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EAF1F3; --panel:#FFFFFF; --ink:#16293A; --muted:#5B6F7E; --line:#C9D6DD;
+  --air:#F7FAFB; --water:rgba(52,140,205,.5); --water-edge:#2E7DB3; --glass:#8FA9B8; --added:rgba(232,84,140,.55); --added-edge:#D6336C; --added-top:rgba(245,150,185,.85); --water-top:rgba(120,190,235,.6); --glassface:rgba(205,228,240,.28); --rim:#7FA7BF;
+  --box:#3E5C70; --weight:#C98A00; --buoy:#1C8F5F; --support:#7550C0; --alert:#C2413A;
+  --ref:#1C8F5F;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1B24; --panel:#172733; --ink:#E4EEF3; --muted:#9AB0BE; --line:#2C4252;
+    --air:#13222D; --water:rgba(70,160,220,.34); --water-edge:#5DB2E6; --glass:#5E7E92; --added:rgba(255,120,170,.5); --added-edge:#FF7EA8; --added-top:rgba(255,160,195,.7); --water-top:rgba(110,190,240,.5); --glassface:rgba(140,190,220,.14); --rim:#9CC6DE;
+    --box:#A9C3D3; --weight:#F0B429; --buoy:#3CCB8B; --support:#A88BEF; --alert:#F07167; --ref:#3CCB8B;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1B24; --panel:#172733; --ink:#E4EEF3; --muted:#9AB0BE; --line:#2C4252;
+  --air:#13222D; --water:rgba(70,160,220,.34); --water-edge:#5DB2E6; --glass:#5E7E92; --added:rgba(255,120,170,.5); --added-edge:#FF7EA8; --added-top:rgba(255,160,195,.7); --water-top:rgba(110,190,240,.5); --glassface:rgba(140,190,220,.14); --rim:#9CC6DE;
+  --box:#A9C3D3; --weight:#F0B429; --buoy:#3CCB8B; --support:#A88BEF; --alert:#F07167; --ref:#3CCB8B;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:clamp(1.35rem,2.6vw,1.9rem);font-weight:900;margin:4px 0 2px;letter-spacing:.02em}
+.sub{color:var(--muted);margin:0 0 16px;font-size:.98rem}
+.grid{display:grid;grid-template-columns:1fr;gap:16px}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 10px 14px}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:inherit}
+.controls{padding:6px 10px 0}
+.ctl-label{display:flex;justify-content:space-between;align-items:baseline;font-weight:900;font-size:1.25rem}
+.ctl-label output{font-size:2rem;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;margin:10px 0 2px;accent-color:var(--added-edge);height:28px}
+.ticks{position:relative;height:24px;font-size:1rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.ticks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.ticks .rim{color:var(--alert);font-weight:700}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-size:1.1rem;font-weight:700;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);
+  padding:8px 16px;cursor:pointer;min-height:44px}
+button:hover{border-color:var(--water-edge)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--water-edge);outline-offset:2px}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.reset{margin-left:auto}
+.scenebox{position:relative;background:var(--panel)}
+.scenebox:fullscreen{display:flex;flex-direction:column;justify-content:center;padding:2vh 3vw}
+.scenebox:fullscreen svg{max-height:74vh}
+.caption{display:block;margin:8px 4px 0;background:rgba(16,32,46,.88);color:#fff;border-radius:12px;
+  padding:12px 18px;font-size:clamp(1.05rem,2.3vw,1.6rem);font-weight:700;line-height:1.45;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+.scenebox:fullscreen .caption{font-size:2.2rem}
+.caption[hidden]{display:none}
+.caption.ask{background:rgba(214,51,108,.94)}
+.cstep{display:inline-block;font-size:.72em;font-weight:900;background:rgba(255,255,255,.2);border-radius:6px;padding:1px 8px;margin-right:10px;vertical-align:2px}
+button.play{background:var(--added-edge);border-color:var(--added-edge);color:#fff}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:1rem;margin-top:10px;color:var(--muted)}
+.legend i{display:inline-block;width:18px;height:18px;border-radius:4px;vertical-align:-3px;margin-right:6px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.status{font-weight:900;font-size:1.35rem;padding:8px 12px;border-radius:10px;background:var(--bg);margin-bottom:12px;border-left:5px solid var(--buoy)}
+.status.warn{border-left-color:var(--alert)}
+dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+dl>div{background:var(--bg);border-radius:12px;padding:10px 14px}
+dt{color:var(--muted);font-size:1rem}
+dd{margin:0;font-weight:900;font-size:1.9rem;line-height:1.2;font-variant-numeric:tabular-nums}
+dd.w{color:var(--weight)} dd.b{color:var(--buoy)} dd.n{color:var(--support)}
+.formula{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);font-size:1.1rem;color:var(--muted)}
+.formula b{color:var(--ink)}
+.note{font-size:.85rem;color:var(--muted);margin-top:14px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.card h2{font-size:1.3rem;font-weight:900;margin:0 0 10px}
+.predict{border:2px solid var(--added-edge)}
+.q{margin:0 0 14px}
+.q p{margin:0 0 6px;font-weight:700;font-size:1.1rem}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opts label{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer;font-size:1.05rem;min-height:44px;background:var(--bg)}
+.opts label:has(input:checked){border-color:var(--added-edge);background:var(--panel);font-weight:900}
+.opts input{accent-color:var(--added-edge);width:18px;height:18px}
+.q input[type=number]{font:inherit;font-size:1.2rem;width:130px;padding:6px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+.hint{font-size:.95rem;color:var(--muted);margin:6px 0 0}
+button.primary{background:var(--added-edge);border-color:var(--added-edge);color:#fff}
+button.linkish{background:none;border:none;color:var(--muted);text-decoration:underline;font-weight:500;font-size:.95rem}
+.err{color:var(--alert);font-weight:700;margin:8px 0 0;min-height:1.2em}
+.predsum{font-size:1.05rem}
+.predsum b{color:var(--added-edge)}
+.meter{margin:0 0 14px}
+.mtrack{position:relative;height:30px;background:var(--bg);border-radius:8px;overflow:visible}
+.mfill{position:absolute;left:0;top:0;bottom:0;background:var(--buoy);border-radius:8px 0 0 8px;transition:none}
+.mcap{position:absolute;top:-8px;bottom:-8px;width:4px;background:var(--alert);transform:translateX(-2px)}
+.mw{position:absolute;top:-6px;bottom:-6px;width:6px;background:var(--weight);border-radius:3px;transform:translateX(-3px)}
+.mlab{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.95rem;color:var(--muted);margin-top:8px}
+.mlab span b{font-weight:900}
+.lab{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}
+@media (max-width:820px){.lab{grid-template-columns:1fr}}
+.tablewrap{overflow-x:auto;max-height:360px;overflow-y:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:1rem}
+th,td{padding:6px 6px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:700;font-size:.92rem;position:sticky;top:0;background:var(--panel)}
+td:first-child,th:first-child{text-align:center}
+tr.sunkrow td{color:var(--alert);font-weight:900}
+.empty{color:var(--muted);padding:20px 0;text-align:center}
+.scrub{display:none;margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--bg);border:2px solid var(--alert)}
+.scrub.on{display:block}
+.scrub .ctl-label{font-size:1.1rem}
+.scrub input[type=range]{accent-color:var(--alert)}
+.reveal{border:2px solid var(--buoy)}
+.rv{display:grid;gap:8px;margin:0 0 14px;padding:0;list-style:none}
+.rv li{background:var(--bg);border-radius:10px;padding:10px 14px;font-size:1.05rem}
+.rv .ok{color:var(--buoy);font-weight:900}
+.rv .no{color:var(--alert);font-weight:900}
+.think{border-top:1px dashed var(--line);padding-top:12px}
+.think p{font-size:1.1rem;margin:0 0 10px}
+.ans{margin-top:12px;font-size:1.08rem;background:var(--bg);border-radius:10px;padding:12px 14px}
+.ans p{margin:0 0 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>船沉了，浮力變大還是變小？</h1>
+  <p class="sub">往盒子裡倒水，觀察浮力怎麼變。特別注意：浮力到了極限的那一刻，會發生什麼事？</p>
+
+  <div class="grid">
+    <section class="card predict" id="predict" aria-labelledby="predTitle">
+      <h2 id="predTitle">先預測，再動手</h2>
+      <div id="predForm">
+        <div class="q"><p>1. 盒子還浮著的時候，倒越多水，浮力會怎樣？</p>
+          <div class="opts"><label><input type="radio" name="q1" value="up">變大</label><label><input type="radio" name="q1" value="down">變小</label><label><input type="radio" name="q1" value="same">不變</label></div></div>
+        <div class="q"><p>2. 盒子沉到底以後，浮力和「沉下去前一刻」相比會怎樣？</p>
+          <div class="opts"><label><input type="radio" name="q2" value="up">變大</label><label><input type="radio" name="q2" value="down">變小</label><label><input type="radio" name="q2" value="same">一樣</label></div></div>
+        <div class="q"><p>3. 最多能倒幾 g 的水，盒子還浮得住？</p>
+          <input type="number" id="q3" min="0" max="3000" step="10" inputmode="numeric" aria-label="最多能倒入的水（g）"> g
+          <p class="hint">盒子：底面積 100 cm²、高 10 cm、盒重 200 gw。1 g 的水體積是 1 cm³。</p></div>
+        <div class="btns"><button id="submitPred" class="primary" type="button">送出預測，開始實驗</button><button id="skipPred" class="linkish" type="button">老師示範：跳過預測</button></div>
+        <p class="err" id="predErr" role="alert"></p>
+      </div>
+      <p class="predsum" id="predSum" hidden></p>
+    </section>
+
+    <section class="stage" aria-label="水槽模擬">
+      <div class="scenebox" id="scenebox">
+        <svg id="scene" viewBox="0 0 980 600" role="img" aria-label="水槽立體圖，盒子漂浮在水中"></svg>
+        <div class="caption" id="caption" aria-live="polite" hidden><span class="cstep" id="cstep"></span><span id="ctext"></span></div>
+      </div>
+      <div class="controls">
+        <div class="ctl-label"><label for="water">倒入盒中的水</label><output id="wOut">0 g</output></div>
+        <input id="water" type="range" min="0" max="850" step="10" value="0" aria-describedby="rimHint">
+        <div class="ticks" aria-hidden="true" id="ticks"></div>
+        <div class="btns">
+          <button id="minus" type="button">−50 g</button>
+          <button id="plus" type="button">＋50 g</button>
+          <button id="rec" type="button">記錄這一筆</button>
+          <button id="play" class="play" type="button">▶ 動畫播放</button>
+          <button id="full" type="button">⛶ 全螢幕</button>
+          <button id="reset" class="reset" type="button">重設</button>
+        </div>
+        <div class="legend"><span><i style="background:var(--added)"></i>倒進盒子的水</span><span><i style="background:var(--water)"></i>水槽裡的水</span></div>
+        <div class="scrub" id="scrub">
+          <div class="ctl-label"><label for="scrubR">拖曳看沉沒的每一刻</label><output id="scrubOut">100%</output></div>
+          <input id="scrubR" type="range" min="0" max="100" step="1" value="100">
+          <div class="btns"><button id="slow" type="button">⏪ 慢動作重播</button></div>
+        </div>
+        <p class="note" id="rimHint">每 1 g 的水體積是 1 cm³。盒子沉底後就回不去了，要重來請按「重設」。</p>
+      </div>
+    </section>
+
+    <section class="panel" aria-live="polite">
+      <div class="status" id="status">漂浮中：重量 = 浮力</div>
+      <div class="meter" aria-hidden="true">
+        <div class="mtrack"><div class="mfill" id="mB"></div><div class="mcap" id="mCap"></div><div class="mw" id="mW"></div></div>
+        <div class="mlab"><span><b style="color:var(--buoy)">綠色</b>＝目前浮力</span><span><b style="color:var(--weight)">黃線</b>＝總重量</span><span><b style="color:var(--alert)">紅線</b>＝浮力上限 1000 gw（整個盒子都在水面下）</span></div>
+      </div>
+      <dl>
+        <div><dt id="wLabel">總重量（盒 200 + 水）</dt><dd class="w" id="dW">200 gw</dd></div>
+        <div><dt>浮力</dt><dd class="b" id="dB">200 gw</dd></div>
+        <div><dt>槽底支撐力</dt><dd class="n" id="dN">0 gw</dd></div>
+        <div><dt>吃水深度</dt><dd id="dH">2.00 cm</dd></div>
+        <div><dt>水槽水位</dt><dd id="dL">15.00 cm</dd></div>
+      </dl>
+      <div class="formula" id="formula"></div>
+      <p class="note">盒子設定：底面積 100 cm²、高 10 cm、盒重 200 gw、盒壁本身的體積 80 cm³。水槽底面積 500 cm²。</p>
+    </section>
+
+    <section class="lab">
+      <div class="card">
+        <h2>浮力與倒入的水</h2>
+        <svg id="graph" viewBox="0 0 540 360" role="img" aria-label="浮力對倒入水量的圖"></svg>
+      </div>
+      <div class="card">
+        <h2>實驗紀錄</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>次</th><th>倒入的水 (g)</th><th>總重量 (gw)</th><th>吃水 (cm)</th><th>浮力 (gw)</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table></div>
+        <p class="empty" id="empty">按「記錄這一筆」，數據會出現在這裡和左邊的圖上。</p>
+      </div>
+    </section>
+
+    <section class="card reveal" id="reveal" hidden aria-live="polite">
+      <h2>對照你的預測</h2>
+      <ul class="rv" id="rvList"></ul>
+      <div class="think">
+        <p><b>想一想：</b>浮力從 1000 gw 掉到 80 gw，一口氣少了 920 gw。少掉的這 920 cm³，是盒子的哪一部分？</p>
+        <button id="showAns" type="button">看解說</button>
+        <div class="ans" id="ans" hidden>
+          <p>還沒沉的時候，盒子連同「盒子內部的空間」一起把水推開。整個盒子都壓到水面下時，最多排開 100 × 10 = 1000 cm³，所以浮力的上限是 1000 gw，最多只能撐住 1000 gw 的總重量，也就是最多倒 800 g 的水。</p>
+          <p>再多倒一點，總重量超過浮力上限，盒緣沉到水面下，水就灌進盒子。盒子內部被水填滿，不再幫忙排開水，只剩盒壁本身的 80 cm³，浮力只剩 80 gw。</p>
+          <p><b>少掉的 920 cm³，正是盒子內部的空間（1000 − 80）。</b>所以船沉了，浮力是變小的。</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---- 物理常數（單位：cm、g、gw；水的密度 1 g/cm³）----
+  const BOX_W = 200, A = 100, H = 10, V_WALL = 80, TANK_A = 500;
+  const L_START = 15, V0 = L_START*TANK_A - BOX_W;   // 水槽原有水量 7300 cm³
+  const RIM = A*H - BOX_W;                            // 最多可加 800 g
+  const B_MAX = A*H, INNER = A*H - V_WALL;            // 浮力上限 1000；盒內空間 920
+  const NEAR = 700;                                    // 接近極限的提醒門檻
+  // ---- 畫面比例 ----
+  const S = 22, X0 = 40, FLOOR = 570, TW = 30, TH = 22;
+  const BW = 10*S, BX = X0 + (TW*S - BW)/2, CX = BX + BW/2;
+  const F_SCALE = 230/1000;
+  const y = cm => FLOOR - cm*S;
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = id => document.getElementById(id);
+  const svg = $('scene'), slider = $('water'), gsvg = $('graph');
+
+  let w = 0, sunk = false, sinkStart = 0, sinkDur = 5000, pourUntil = 0, raf = null;
+  let scrubP = null, restDone = false, playing = false, predicted = false;
+  let pred = null; const records = [];
+  const SINK_MS = 5000, FLOOD = .35;
+
+  [0,200,400,600,800].forEach(v=>{
+    const sp=document.createElement('span');
+    sp.style.left=(v/850*100)+'%';
+    sp.textContent = v===800 ? '800 盒緣' : v;
+    if(v===800) sp.className='rim';
+    $('ticks').appendChild(sp);
+  });
+
+  const ease = t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+
+  function progress(now){
+    if(scrubP!=null) return scrubP;
+    return reduce ? 1 : Math.min(1,(now-sinkStart)/sinkDur);
+  }
+
+  function model(now){
+    if(!sunk){
+      const h=(BOX_W+w)/A;
+      return {phase:'float', L:L_START + w/TANK_A, bottom:L_START + w/TANK_A - h, inner:w/A,
+              W:BOX_W+w, B:BOX_W+w, N:0, h};
+    }
+    const p = progress(now);
+    const L0 = L_START + RIM/TANK_A, b0 = L0 - H;
+    const Lf = (V0 + w + V_WALL)/TANK_A;
+    if(p < FLOOD){
+      // 盒緣貼齊水面、浮力已到上限；外面的水灌進來，總重量繼續增加
+      const k=p/FLOOD;
+      const vol = Math.min(INNER, w + (INNER-w)*k);
+      return {phase:'flood', L:L0, bottom:b0, inner:w/A + (H-w/A)*k, W:BOX_W+vol, B:B_MAX, N:0, h:H, p};
+    }
+    const e = ease((p-FLOOD)/(1-FLOOD));
+    return {phase: p>=1?'rest':'fall', L:L0+(Lf-L0)*e, bottom:b0*(1-e), inner:99,
+            W:BOX_W, B:V_WALL, N: p>=1 ? BOX_W-V_WALL : 0, h:null, p};
+  }
+
+  function arrow(x,y1,len,dir,color,label,labelDx){
+    if(len<=0) return '';
+    const y2=y1+dir*len, hd=Math.min(18,Math.max(10,len*.5));
+    const tipBase=y2-dir*hd;
+    let ly = y2 + dir*20;
+    if(dir>0 && ly>FLOOR-30){ ly=FLOOR-30; labelDx = labelDx<0 ? -26 : 26; }
+    return `<line x1="${x}" y1="${y1}" x2="${x}" y2="${tipBase}" stroke="${color}" stroke-width="10" stroke-linecap="round"/>
+      <polygon points="${x-14},${tipBase} ${x+14},${tipBase} ${x},${y2}" fill="${color}"/>
+      <text x="${x+labelDx}" y="${ly+5}" text-anchor="${labelDx<0?'end':labelDx>0?'start':'middle'}" font-size="21" font-weight="900" fill="${color}"
+        paint-order="stroke" stroke="var(--panel)" stroke-width="4">${label}</text>`;
+  }
+
+  // ---- 立體（斜投影）設定：往右上方偏移代表「往後」----
+  const TDX=60, TDY=40;          // 水槽深度方向的偏移
+  const BDX=36, BDY=24;          // 盒子深度方向的偏移
+  const SHX=(TDX-BDX)/2, SHY=(TDY-BDY)/2; // 盒子置於水槽深度中央
+
+  function prism(x1,x2,yTop,yBot,dx,dy){ // 回傳各面座標字串
+    return {
+      front:`${x1},${yTop} ${x2},${yTop} ${x2},${yBot} ${x1},${yBot}`,
+      top:`${x1},${yTop} ${x2},${yTop} ${x2+dx},${yTop-dy} ${x1+dx},${yTop-dy}`,
+      side:`${x2},${yTop} ${x2+dx},${yTop-dy} ${x2+dx},${yBot-dy} ${x2},${yBot}`,
+      sil:`${x1},${yBot} ${x1},${yTop} ${x1+dx},${yTop-dy} ${x2+dx},${yTop-dy} ${x2+dx},${yBot-dy} ${x2},${yBot}`
+    };
+  }
+
+  function draw(now){
+    const m=model(now);
+    const yL=y(m.L), yb=y(m.bottom), yt=y(m.bottom+H);
+    const innerLvl = m.inner>=99 ? Math.min(m.L, m.bottom+H) : m.bottom + m.inner;
+    const yi=y(innerLvl);
+    const XR=X0+TW*S, YT=y(TH);
+    let s='';
+
+    // ===== 水槽後方：後壁、槽底 =====
+    s+=`<polygon points="${X0+TDX},${YT-TDY} ${XR+TDX},${YT-TDY} ${XR+TDX},${FLOOR-TDY} ${X0+TDX},${FLOOR-TDY}" fill="var(--air)" stroke="var(--glass)" stroke-width="2" opacity=".9"/>`;
+    s+=`<polygon points="${X0},${FLOOR} ${XR},${FLOOR} ${XR+TDX},${FLOOR-TDY} ${X0+TDX},${FLOOR-TDY}" fill="var(--glassface)" stroke="var(--glass)" stroke-width="2"/>`;
+    s+=`<line x1="${X0}" y1="${YT}" x2="${X0+TDX}" y2="${YT-TDY}" stroke="var(--glass)" stroke-width="2"/>`;
+    s+=`<line x1="${X0}" y1="${FLOOR}" x2="${X0+TDX}" y2="${FLOOR-TDY}" stroke="var(--glass)" stroke-width="2"/>`;
+    // 水體：正面 + 側面 + 水面
+    const tw=prism(X0,XR,yL,FLOOR,TDX,TDY);
+    s+=`<polygon points="${tw.side}" fill="var(--water)" opacity=".8"/>`;
+    s+=`<polygon points="${tw.front}" fill="var(--water)"/>`;
+    s+=`<polygon points="${tw.top}" fill="var(--water-top)" stroke="var(--water-edge)" stroke-width="1.5"/>`;
+
+    // ===== 盒子（整組平移到水槽深度中央）=====
+    s+=`<g transform="translate(${SHX},${-SHY})">`;
+    const bx=prism(BX,BX+BW,yt,yb,BDX,BDY);
+    // 盒內空間（遮住後面的水，代表盒內是空氣）
+    s+=`<polygon points="${bx.sil}" fill="var(--air)"/>`;
+    // 後壁與底面（淡）
+    s+=`<polygon points="${BX+BDX},${yt-BDY} ${BX+BW+BDX},${yt-BDY} ${BX+BW+BDX},${yb-BDY} ${BX+BDX},${yb-BDY}" fill="var(--glassface)" stroke="var(--box)" stroke-width="2" opacity=".55"/>`;
+    s+=`<polygon points="${BX},${yb} ${BX+BW},${yb} ${BX+BW+BDX},${yb-BDY} ${BX+BDX},${yb-BDY}" fill="var(--glassface)" stroke="var(--box)" stroke-width="2" opacity=".8"/>`;
+    s+=`<line x1="${BX}" y1="${yt}" x2="${BX+BDX}" y2="${yt-BDY}" stroke="var(--box)" stroke-width="2" opacity=".55"/>`;
+    // 盒內的水（立體）
+    if(m.inner>0 && yi<yb){
+      const fill = m.inner>=99 ? 'var(--water)' : 'var(--added)';
+      const top  = m.inner>=99 ? 'var(--water-top)' : 'var(--added-top)';
+      const edge = m.inner>=99 ? 'var(--water-edge)' : 'var(--added-edge)';
+      const iw=prism(BX,BX+BW,yi,yb,BDX,BDY);
+      s+=`<polygon points="${iw.side}" fill="${fill}" opacity=".85"/>`;
+      s+=`<polygon points="${iw.front}" fill="${fill}"/>`;
+      if(yi>yt+0.5 || m.inner<99) s+=`<polygon points="${iw.top}" fill="${top}" stroke="${edge}" stroke-width="2"/>`;
+    }
+    // 灌入動畫
+    if(m.phase==='flood'){
+      s+=`<path d="M${BX-2},${yt} q10,12 14,40" stroke="var(--water-edge)" stroke-width="5" fill="none" opacity=".85"/>
+          <path d="M${BX+BW+2},${yt} q-10,12 -14,40" stroke="var(--water-edge)" stroke-width="5" fill="none" opacity=".85"/>`;
+    }
+    // 右側面（半透明壓克力）與前緣
+    s+=`<polygon points="${bx.side}" fill="var(--glassface)" stroke="var(--box)" stroke-width="3"/>`;
+    s+=`<polygon points="${bx.front}" fill="var(--glassface)" stroke="var(--box)" stroke-width="5" stroke-linejoin="round"/>`;
+    // 開口邊緣（亮邊）
+    const near = m.phase==='float' && w>=NEAR;
+    s+=`<polygon points="${bx.top}" fill="none" stroke="${near?'var(--alert)':'var(--rim)'}" stroke-width="${near?6:3}" stroke-linejoin="round"/>`;
+    if(near) s+=`<text x="${BX+BW/2+BDX/2}" y="${yt-BDY-40}" text-anchor="middle" font-size="18" font-weight="900" fill="var(--alert)" paint-order="stroke" stroke="var(--panel)" stroke-width="5">${w===RIM?'盒緣貼齊水面：浮力到極限了！':'盒緣快碰到水面了'}</text>`;
+    s+=`</g>`;
+
+    // 前方的水再薄薄罩一層，讓沒入水中的部分有「在水裡」的感覺
+    s+=`<rect x="${X0}" y="${yL}" width="${TW*S}" height="${FLOOR-yL}" fill="var(--water)" opacity=".28"/>`;
+
+    // ===== 標示（跟著盒子正面）=====
+    s+=`<g transform="translate(${SHX},${-SHY})">`;
+    const yLb = yL; // 盒子正面位於水槽深度中央，水面線在此平移座標中恰為 yL
+    for(let k=0;k<=H;k++){
+      const ty=y(m.bottom+k), len = k%2===0 ? 10 : 6;
+      s+=`<line x1="${BX-3}" y1="${ty}" x2="${BX-3-len}" y2="${ty}" stroke="var(--box)" stroke-width="1.5"/>`;
+      if(k%2===0) s+=`<text x="${BX-18}" y="${ty+5}" text-anchor="end" font-size="16" fill="var(--muted)">${k}</text>`;
+    }
+    if(m.phase==='float'){
+      const yr=y(m.bottom+2);
+      s+=`<line x1="${BX}" y1="${yr}" x2="${BX+BW}" y2="${yr}" stroke="var(--ref)" stroke-width="2.5" stroke-dasharray="6 5"/>`;
+      s+=`<text x="${BX+BW+BDX+10}" y="${yr+4}" font-size="16" font-weight="700" fill="var(--ref)">空盒吃水線 2 cm</text>`;
+      s+=`<line x1="${BX-40}" y1="${yLb}" x2="${BX+BW}" y2="${yLb}" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="8 5"/>`;
+      s+=`<text x="${BX+BW+BDX+10}" y="${yLb-10}" font-size="20" font-weight="900" fill="var(--ink)" paint-order="stroke" stroke="var(--panel)" stroke-width="4">吃水 ${m.h.toFixed(2)} cm</text>`;
+    }
+    if(!sunk && now<pourUntil){
+      s+=`<rect x="${CX-60}" y="0" width="12" height="${Math.max(0,yi-SHY)}" rx="4" fill="var(--added-edge)" opacity=".75"/>`;
+    }
+    const cy=y(m.bottom+H/2);
+    s+=arrow(CX-18, cy, m.W*F_SCALE, 1, 'var(--weight)', `重量 ${Math.round(m.W)} gw`, -20);
+    s+=arrow(CX+18, cy, m.B*F_SCALE, -1, 'var(--buoy)', `浮力 ${Math.round(m.B)} gw`, m.N>0||m.phase==='fall' ? -20 : 20);
+    if(m.N>0) s+=arrow(CX+60, cy, m.N*F_SCALE, -1, 'var(--support)', `支撐力 ${m.N} gw`, 20);
+    const net=m.W-m.B-m.N;
+    if(net>0.5){
+      const nx=BX-95, ny=cy-10, nl=Math.max(50,net*F_SCALE);
+      s+=`<line x1="${nx}" y1="${ny}" x2="${nx}" y2="${ny+nl-16}" stroke="var(--alert)" stroke-width="10" stroke-linecap="round"/>
+        <polygon points="${nx-14},${ny+nl-16} ${nx+14},${ny+nl-16} ${nx},${ny+nl}" fill="var(--alert)"/>
+        <text x="${nx}" y="${ny-34}" text-anchor="middle" font-size="19" font-weight="900" fill="var(--alert)" paint-order="stroke" stroke="var(--panel)" stroke-width="4">合力向下</text>
+        <text x="${nx}" y="${ny-12}" text-anchor="middle" font-size="19" font-weight="900" fill="var(--alert)" paint-order="stroke" stroke="var(--panel)" stroke-width="4">${Math.round(net)} gw</text>`;
+    }
+    s+=`<circle cx="${CX}" cy="${cy}" r="6" fill="var(--ink)"/>`;
+    s+=`</g>`;
+
+    // ===== 水槽前緣玻璃 =====
+    s+=`<path d="M${X0},${YT} V${FLOOR} H${XR} V${YT}" fill="none" stroke="var(--glass)" stroke-width="6" stroke-linejoin="round"/>`;
+    s+=`<path d="M${XR},${YT} L${XR+TDX},${YT-TDY} V${FLOOR-TDY} L${XR},${FLOOR}" fill="none" stroke="var(--glass)" stroke-width="3" stroke-linejoin="round"/>`;
+    s+=`<line x1="${X0}" y1="${YT}" x2="${XR}" y2="${YT}" stroke="var(--glass)" stroke-width="2" opacity=".6"/>`;
+
+    // ===== 右側水位刻度 =====
+    const RX=XR+TDX+14;
+    for(let k=0;k<=TH;k++){
+      const ty=y(k), len=k%5===0?12:6;
+      s+=`<line x1="${RX}" y1="${ty}" x2="${RX+len}" y2="${ty}" stroke="var(--glass)" stroke-width="1.5"/>`;
+      if(k%5===0) s+=`<text x="${RX+16}" y="${ty+5}" font-size="15" fill="var(--muted)">${k}</text>`;
+    }
+    s+=`<line x1="${XR}" y1="${yL}" x2="${RX}" y2="${yL}" stroke="var(--water-edge)" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+    s+=`<polygon points="${RX},${yL} ${RX+12},${yL-7} ${RX+12},${yL+7}" fill="var(--water-edge)"/>`;
+    s+=`<text x="${RX+40}" y="${yL+5}" font-size="17" font-weight="900" fill="var(--water-edge)">水位 ${m.L.toFixed(2)}</text>`;
+    s+=`<text x="${RX-10}" y="${YT-14}" font-size="15" fill="var(--muted)">水槽刻度 (cm)</text>`;
+
+    svg.innerHTML=s;
+    updatePanel(m);
+    drawGraph(m);
+    return m;
+  }
+
+
+  function updatePanel(m){
+    const st=$('status');
+    let txt;
+    if(m.phase==='float'){
+      txt = w===RIM ? '臨界！盒緣剛好貼齊水面，浮力到達上限 1000 gw'
+          : w>=NEAR ? `接近極限！再倒 ${RIM-w} g，盒緣就碰到水面`
+          : '漂浮中：重量 = 浮力';
+    }else if(m.phase==='flood'){
+      txt = `總重量 ${Math.round(m.W)} gw 超過浮力上限 1000 gw，水從盒緣灌進來！`;
+    }else if(m.phase==='fall'){
+      txt = '盒內灌滿水，盒子一路往下沉：重量 200 ＞ 浮力 80';
+    }else{
+      txt = '沉底靜止：重量 200 = 浮力 80 + 支撐力 120';
+    }
+    st.textContent=txt;
+    st.classList.toggle('warn', m.phase!=='float' || w>=NEAR);
+    $('wLabel').textContent = (m.phase==='fall'||m.phase==='rest') ? '盒子重量（盒內水已與水槽相通）' : '總重量（盒 200 + 水）';
+    $('dW').textContent=Math.round(m.W)+' gw';
+    $('dB').textContent=Math.round(m.B)+' gw';
+    $('dN').textContent=Math.round(m.N)+' gw';
+    $('dH').textContent= m.h!=null ? m.h.toFixed(2)+' cm' : '完全沒入';
+    $('dL').textContent=m.L.toFixed(2)+' cm';
+    $('wOut').textContent=w+' g';
+    $('formula').innerHTML = m.phase==='float'
+      ? `浮力 = 排開水的體積 × 1 gw/cm³<br><b>= 100 cm² × ${m.h.toFixed(2)} cm = ${Math.round(m.B)} gw</b>`
+      : m.phase==='flood'
+      ? `整個盒子都在水面下，排開 100 × 10 = 1000 cm³<br><b>浮力最多只有 1000 gw，撐不住了</b>`
+      : `盒子內部灌滿水，只剩盒壁本身排開水<br><b>浮力 = 80 cm³ × 1 gw/cm³ = 80 gw</b>`;
+    // 浮力計
+    const pct=v=>Math.max(0,Math.min(100,v/1200*100))+'%';
+    $('mB').style.width=pct(m.B);
+    $('mW').style.left=pct(m.W);
+    $('mCap').style.left=pct(B_MAX);
+  }
+
+  // ---- 圖表 ----
+  const G={l:66,r:20,t:24,b:54,w:540,h:360,xmax:900,ymax:1200};
+  const gx=v=>G.l+v/G.xmax*(G.w-G.l-G.r);
+  const gy=v=>G.h-G.b-v/G.ymax*(G.h-G.t-G.b);
+  function drawGraph(m){
+    let s='';
+    for(let v=0;v<=G.ymax;v+=200){
+      s+=`<line x1="${G.l}" y1="${gy(v)}" x2="${G.w-G.r}" y2="${gy(v)}" stroke="var(--line)" stroke-width="1"/>`;
+      s+=`<text x="${G.l-8}" y="${gy(v)+5}" text-anchor="end" font-size="14" fill="var(--muted)">${v}</text>`;
+    }
+    for(let v=0;v<=G.xmax;v+=200){
+      s+=`<line x1="${gx(v)}" y1="${G.t}" x2="${gx(v)}" y2="${G.h-G.b}" stroke="var(--line)" stroke-width="1"/>`;
+      s+=`<text x="${gx(v)}" y="${G.h-G.b+22}" text-anchor="middle" font-size="14" fill="var(--muted)">${v}</text>`;
+    }
+    s+=`<line x1="${G.l}" y1="${G.h-G.b}" x2="${G.w-G.r}" y2="${G.h-G.b}" stroke="var(--ink)" stroke-width="2"/>`;
+    s+=`<line x1="${G.l}" y1="${G.t}" x2="${G.l}" y2="${G.h-G.b}" stroke="var(--ink)" stroke-width="2"/>`;
+    s+=`<text x="${(G.l+G.w-G.r)/2}" y="${G.h-8}" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">倒入盒中的水 (g)</text>`;
+    s+=`<text x="18" y="${(G.t+G.h-G.b)/2}" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)" transform="rotate(-90 18 ${(G.t+G.h-G.b)/2})">浮力 (gw)</text>`;
+
+    // 浮力上限：到達臨界或沉沒後才揭示
+    const showCap = sunk || w>=RIM;
+    if(showCap){
+      s+=`<line x1="${G.l}" y1="${gy(B_MAX)}" x2="${G.w-G.r}" y2="${gy(B_MAX)}" stroke="var(--alert)" stroke-width="2.5" stroke-dasharray="8 6"/>`;
+      s+=`<text x="${G.l+8}" y="${gy(B_MAX)-8}" font-size="14" font-weight="900" fill="var(--alert)">浮力上限 1000 gw</text>`;
+    }
+    // 沉沒的斷崖
+    const sunkRec = records.find(r=>r.sunk);
+    const dropping = sunk && m.phase!=='flood';
+    if(dropping){
+      const xv = gx(w);
+      const yEnd = m.phase==='rest' || sunkRec ? gy(V_WALL) : gy(V_WALL);
+      s+=`<line x1="${xv}" y1="${gy(B_MAX)}" x2="${xv}" y2="${yEnd}" stroke="var(--alert)" stroke-width="3" stroke-dasharray="6 5"/>`;
+      s+=`<text x="${xv-10}" y="${(gy(B_MAX)+gy(V_WALL))/2}" text-anchor="end" font-size="16" font-weight="900" fill="var(--alert)" paint-order="stroke" stroke="var(--panel)" stroke-width="4">浮力驟降 920 gw</text>`;
+    }
+    // 紀錄點
+    records.forEach(r=>{
+      s+=`<circle cx="${gx(r.w)}" cy="${gy(r.B)}" r="7" fill="${r.sunk?'var(--alert)':'var(--buoy)'}" stroke="var(--panel)" stroke-width="2"/>`;
+    });
+    // 目前狀態（空心圈）
+    s+=`<circle cx="${gx(w)}" cy="${gy(m.B)}" r="11" fill="none" stroke="var(--ink)" stroke-width="2.5"/>`;
+    gsvg.innerHTML=s;
+  }
+
+  // ---- 紀錄表 ----
+  function record(m){
+    const row = m.phase==='rest'
+      ? {w, W:BOX_W, h:'沒入', B:V_WALL, sunk:true}
+      : {w, W:BOX_W+w, h:((BOX_W+w)/A).toFixed(2), B:BOX_W+w, sunk:false};
+    const i=records.findIndex(r=>r.w===row.w && r.sunk===row.sunk);
+    if(i>=0) records[i]=row; else records.push(row);
+    records.sort((a,b)=>a.sunk-b.sunk || a.w-b.w);
+    renderTable();
+  }
+  function renderTable(){
+    $('tbody').innerHTML = records.map((r,i)=>
+      `<tr class="${r.sunk?'sunkrow':''}"><td>${r.sunk?'沉底':i+1}</td><td>${r.w}</td><td>${r.W}${r.sunk?'（盒）':''}</td><td>${r.h}</td><td>${r.B}</td></tr>`).join('');
+    $('empty').hidden = records.length>0;
+  }
+
+  // ---- 預測與揭示 ----
+  const NAME={up:'變大',down:'變小',same:'不變'};
+  $('submitPred').addEventListener('click',()=>{
+    const q1=document.querySelector('input[name=q1]:checked'), q2=document.querySelector('input[name=q2]:checked');
+    const q3=$('q3').value.trim();
+    if(!q1||!q2||q3===''){ $('predErr').textContent='三題都要作答，才能開始實驗。'; return; }
+    pred={q1:q1.value,q2:q2.value,q3:+q3};
+    $('predSum').innerHTML=`你的預測：① 浮力<b>${NAME[pred.q1]}</b>　② 沉底後浮力<b>${pred.q2==='same'?'一樣':NAME[pred.q2]}</b>　③ 最多倒 <b>${pred.q3} g</b>`;
+    unlock();
+  });
+  $('skipPred').addEventListener('click',()=>{ pred=null; $('predSum').textContent='老師示範模式（未作預測）'; unlock(); });
+  function unlock(){
+    predicted=true; $('predForm').hidden=true; $('predSum').hidden=false; $('predErr').textContent=''; sync();
+  }
+  function showReveal(){
+    const list=$('rvList');
+    if(pred){
+      const mk=(ok,text)=>`<li><span class="${ok?'ok':'no'}">${ok?'✓ 猜對了':'✗ 再想想'}</span>　${text}</li>`;
+      list.innerHTML =
+        mk(pred.q1==='up', `① 倒越多水，浮力<b>變大</b>：從 200 gw 一路增加到 1000 gw（你的預測：${NAME[pred.q1]}）`)+
+        mk(pred.q2==='down', `② 沉底後浮力<b>變小</b>：從 1000 gw 掉到 80 gw（你的預測：${pred.q2==='same'?'一樣':NAME[pred.q2]}）`)+
+        mk(pred.q3===RIM, `③ 最多倒 <b>800 g</b>：1000 cm³ × 1 gw/cm³ − 盒重 200 gw（你的預測：${pred.q3} g）`);
+    }else{
+      list.innerHTML=`<li>① 倒越多水，浮力變大：200 → 1000 gw</li><li>② 沉底後浮力變小：1000 → 80 gw</li><li>③ 最多倒 800 g：1000 − 200</li>`;
+    }
+    $('reveal').hidden=false;
+  }
+  $('showAns').addEventListener('click',()=>{ $('ans').hidden=false; $('showAns').hidden=true; });
+
+  // ---- 動畫迴圈 ----
+  function loop(now){
+    const m=draw(now);
+    if(sunk && scrubP==null){ $('scrubR').value=Math.round(progress(now)*100); $('scrubOut').textContent=$('scrubR').value+'%'; }
+    if(m.phase==='rest' && !restDone){
+      restDone=true; record(m); $('scrub').classList.add('on'); showReveal(); sync();
+    }
+    const busy = now<pourUntil || (sunk && scrubP==null && m.phase!=='rest');
+    raf = busy ? requestAnimationFrame(loop) : null;
+  }
+  function kick(){ if(!raf) raf=requestAnimationFrame(loop); }
+
+  function sync(){
+    const lock=!predicted;
+    slider.disabled = lock || sunk || playing;
+    $('minus').disabled = $('plus').disabled = lock || sunk || playing;
+    $('rec').disabled = lock || sunk || playing;
+    $('play').disabled = lock;
+    $('scrubR').disabled = playing;
+    $('slow').disabled = !restDone || playing;
+  }
+
+  function setW(v){
+    if(sunk) return;
+    v=Math.max(0,Math.min(850,v));
+    if(v>w) pourUntil=performance.now()+(reduce?0:500);
+    w=v; slider.value=v;
+    if(w>RIM){ sunk=true; sinkStart=performance.now(); sinkDur=SINK_MS; scrubP=null; }
+    sync(); kick();
+  }
+
+  slider.addEventListener('input',e=>setW(+e.target.value));
+  $('plus').addEventListener('click',()=>setW(w+50));
+  $('minus').addEventListener('click',()=>setW(w-50));
+  $('rec').addEventListener('click',()=>{ record(model(performance.now())); kick(); });
+
+  $('scrubR').addEventListener('input',e=>{
+    scrubP=+e.target.value/100; $('scrubOut').textContent=e.target.value+'%'; draw(performance.now());
+  });
+  $('slow').addEventListener('click',()=>{
+    scrubP=null; sinkStart=performance.now(); sinkDur=SINK_MS*2.5; kick();
+  });
+
+  // ---- 自動演示（分段字幕）----
+  let run=0, paused=false, waitingAsk=null;
+  const capBox=$('caption'), capText=$('ctext'), capStep=$('cstep');
+  const STEPS=8;
+  function caption(i,text,ask){
+    capBox.hidden=false; capBox.classList.toggle('ask',!!ask);
+    capStep.textContent=`${i} / ${STEPS}`; capText.textContent=text;
+  }
+  function setPlayBtn(){
+    $('play').textContent = !playing ? '▶ 動畫播放' : (paused||waitingAsk) ? '▶ 繼續' : '⏸ 暫停';
+  }
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  async function wait(ms,id){ // 可暫停的等待
+    let left=reduce?Math.min(ms,300):ms;
+    while(left>0){ if(id!==run) throw 'stop'; if(!paused) left-=50; await sleep(50); }
+    if(id!==run) throw 'stop';
+  }
+  async function ask(i,text,id){ // 停下來讓老師提問，按「繼續」才往下
+    caption(i,text,true);
+    await new Promise(res=>{ waitingAsk=res; setPlayBtn(); });
+    waitingAsk=null; setPlayBtn();
+    if(id!==run) throw 'stop';
+  }
+  async function pourTo(target,id){
+    while(w<target){ setW(w+10); if(w%100===0) record(model(performance.now())); await wait(reduce?10:90,id); }
+  }
+  async function untilRest(id){ while(!restDone){ if(id!==run) throw 'stop'; await sleep(60); } }
+
+  async function demo(){
+    const id=++run; paused=false; playing=true; sync(); setPlayBtn();
+    try{
+      record(model(performance.now()));
+      caption(1,'這是一個空盒子，盒重 200 gw，浮在水面上。現在吃水 2 cm：重量 200 gw = 浮力 200 gw。');
+      await wait(4500,id);
+      caption(2,'往盒子裡倒水，盒子變重了……看！盒子沉得更深了。');
+      await pourTo(300,id); await wait(800,id);
+      caption(3,'沉得越深，排開的水越多，浮力就越大。重量和浮力一起變大，所以盒子還是浮著。');
+      await pourTo(600,id); await wait(1500,id);
+      await ask(4,'想一想：一直倒下去，浮力會不會無限變大？（按「繼續」）',id);
+      caption(5,'注意盒緣！它離水面越來越近……');
+      await pourTo(RIM,id);
+      caption(6,'臨界！盒緣貼齊水面，整個盒子排開 1000 cm³，浮力到了上限 1000 gw，最多只能撐住 1000 gw。');
+      await wait(5000,id);
+      await ask(6,'再多倒一點點水，會發生什麼事？先說說你的預測。（按「繼續」）',id);
+      caption(7,'總重量超過浮力上限，水從盒緣灌進來了！');
+      setW(RIM+30);
+      while(model(performance.now()).phase==='flood'){ if(id!==run) throw 'stop'; await sleep(60); }
+      caption(7,'盒子裡灌滿水，只剩盒壁排開水，浮力一口氣掉到 80 gw。重量 200 ＞ 浮力 80，盒子一路往下沉！');
+      await untilRest(id);
+      caption(8,'沉到槽底：重量 200 = 浮力 80 + 支撐力 120。船沉了，浮力從 1000 gw 變成 80 gw，是變小的！');
+      playing=false; sync(); setPlayBtn();
+    }catch(e){ if(e!=='stop') throw e; }
+  }
+
+  // 沉沒動畫中暫停：凍結目前進度；繼續時接著播
+  function pauseToggle(){
+    if(waitingAsk){ waitingAsk(); return; }
+    paused=!paused;
+    const now=performance.now();
+    if(sunk && !restDone){
+      if(paused){ scrubP=progress(now); }
+      else { sinkStart=now-scrubP*sinkDur; scrubP=null; kick(); }
+    }
+    setPlayBtn();
+  }
+
+  function stopPlay(){ run++; paused=false; if(waitingAsk){ const f=waitingAsk; waitingAsk=null; f(); } playing=false; setPlayBtn(); }
+  function resetAll(){
+    stopPlay(); capBox.hidden=true;
+    sunk=false; w=0; slider.value=0; pourUntil=0; scrubP=null; restDone=false;
+    records.length=0; renderTable();
+    $('scrub').classList.remove('on'); $('reveal').hidden=true; $('ans').hidden=true; $('showAns').hidden=false;
+    sync(); kick();
+  }
+  $('reset').addEventListener('click',resetAll);
+  $('play').addEventListener('click',()=>{
+    if(playing){ pauseToggle(); return; }
+    resetAll(); demo();
+  });
+
+  // 全螢幕（投影用）
+  const sb=$('scenebox');
+  if(!sb.requestFullscreen) $('full').hidden=true;
+  $('full').addEventListener('click',()=>{
+    if(document.fullscreenElement) document.exitFullscreen();
+    else sb.requestFullscreen().catch(()=>{ $('full').hidden=true; });
+  });
+
+  renderTable(); sync();
+  draw(performance.now());
+})();
+</script>
+</body>
+</html>

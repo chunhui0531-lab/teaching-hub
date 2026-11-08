@@ -1,0 +1,241 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<title>小地震多能量也多嗎</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap">
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+<style>
+/* Layout: one exam sheet; stimulus (rule card, frequency table, two pies, dialogue) then two staged questions */
+:root {
+  --paper: #fbfbf8; --sheet: #ffffff; --ink: #1d232b; --muted: #5b6470; --rule: #d9dde2;
+  --grid: #eceef1; --accent: #1f5f99; --accent-soft: #e8f0f8; --alert: #c23a32; --ok: #2c7a4b;
+  --stage: #7a4fa0; --stage-soft: #f2ecf8;
+  --p1: #d3e3f3; --p2: #93b9dd; --p3: #4c88c1; --p4: #1d4f82; --pn: #e3e6ea; --news: #c9622f;
+  --serif: "Noto Serif TC", "PMingLiU", "Songti TC", serif;
+  --sans: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14181d; --sheet: #1b2027; --ink: #e6e9ee; --muted: #9aa4b1; --rule: #343c47;
+    --grid: #262d36; --accent: #6fa8dc; --accent-soft: #1f2b38; --alert: #ef7a70; --ok: #6cc28f;
+    --stage: #c3a2e3; --stage-soft: #2a2333;
+    --p1: #2a425b; --p2: #3d6890; --p3: #6c9fd0; --p4: #b2d3f2; --pn: #313943; --news: #e88a5a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14181d; --sheet: #1b2027; --ink: #e6e9ee; --muted: #9aa4b1; --rule: #343c47;
+  --grid: #262d36; --accent: #6fa8dc; --accent-soft: #1f2b38; --alert: #ef7a70; --ok: #6cc28f;
+  --stage: #c3a2e3; --stage-soft: #2a2333;
+  --p1: #2a425b; --p2: #3d6890; --p3: #6c9fd0; --p4: #b2d3f2; --pn: #313943; --news: #e88a5a;
+  color-scheme: dark;
+}
+body {
+  background: var(--paper); color: var(--ink); font-family: var(--serif);
+  font-size: 17px; line-height: 1.85;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+}
+.sheet { max-width: 780px; margin: 0 auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px;
+  padding: clamp(20px, 5vw, 48px); display: flex; flex-direction: column; gap: 28px; }
+header { display: flex; flex-direction: column; gap: 6px; border-bottom: 2px solid var(--ink); padding-bottom: 14px; }
+.eyebrow { font-family: var(--sans); font-size: 13px; letter-spacing: .12em; color: var(--muted); }
+h1 { font-size: 26px; margin: 0; text-wrap: balance; line-height: 1.4; }
+.lead { margin: 0; color: var(--muted); font-size: 15px; font-family: var(--sans); }
+.flow { display: flex; flex-wrap: wrap; gap: 6px; font-family: var(--sans); font-size: 13px; }
+.flow span { background: var(--stage-soft); color: var(--stage); padding: 1px 10px; border-radius: 3px; }
+.src { display: flex; flex-direction: column; gap: 10px; }
+.tag { align-self: flex-start; font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--accent);
+  background: var(--accent-soft); padding: 2px 12px; border-radius: 3px; }
+.doc { border-left: 3px solid var(--rule); padding-left: 16px; }
+.doc p { margin: 0 0 10px; } .doc p:last-child { margin-bottom: 0; }
+figure { margin: 0; overflow-x: auto; }
+figure svg { display: block; width: 100%; min-width: 520px; height: auto; }
+figure.narrow svg { max-width: 560px; margin: 0 auto; min-width: 440px; }
+figcaption { font-family: var(--sans); font-size: 13px; color: var(--muted); text-align: center; margin-top: 4px; }
+.s-grid { stroke: var(--grid); } .s-axis { stroke: var(--ink); }
+.s-text { fill: var(--ink); } .s-muted { fill: var(--muted); } .s-acc { fill: var(--accent); }
+.s-bar { fill: var(--p3); } .s-news { fill: var(--news); } .s-news-t { fill: var(--news); }
+.s-p1 { fill: var(--p1); } .s-p2 { fill: var(--p2); } .s-p3 { fill: var(--p3); } .s-p4 { fill: var(--p4); }
+.s-pn { fill: var(--pn); } .s-sep { stroke: var(--sheet); }
+.talk { display: flex; flex-direction: column; gap: 8px; }
+.say { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 8px; align-items: start; }
+.say b { font-family: var(--sans); font-size: 15px; color: var(--accent); padding-top: 2px; }
+.say p { margin: 0; background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 6px 12px; }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { border: 1px solid var(--rule); padding: 8px 12px; text-align: center; }
+th { font-family: var(--sans); font-weight: 500; font-size: 15px; background: var(--accent-soft); }
+.given { margin: 0; padding: 10px 14px; border: 1px dashed var(--rule); border-radius: 4px; }
+.q { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--rule); padding-top: 20px; }
+.q.sub { border-top: 0; padding-top: 0; }
+.q-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+.q-head b { font-family: var(--sans); font-size: 17px; }
+.stage { font-family: var(--sans); font-size: 13px; color: var(--stage); background: var(--stage-soft); padding: 0 10px; border-radius: 3px; }
+.kind { font-family: var(--sans); font-size: 13px; color: var(--muted); }
+.q-stem { margin: 0; }
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.opts.short { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 560px) { .opts, .opts.short { grid-template-columns: minmax(0, 1fr); } }
+.opt { font: inherit; color: var(--ink); background: var(--sheet); text-align: left; border: 1px solid var(--rule);
+  border-radius: 4px; padding: 6px 12px; cursor: pointer; min-width: 0; }
+.opt:hover { border-color: var(--accent); }
+.opt:focus-visible, input:focus-visible, textarea:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.opt.right { border-color: var(--ok); color: var(--ok); font-weight: 600; }
+.opt.wrong { border-color: var(--alert); color: var(--alert); text-decoration: line-through; }
+.fb { font-family: var(--sans); font-size: 14px; min-height: 1.4em; margin: 0; color: var(--muted); }
+.fb.good { color: var(--ok); } .fb.bad { color: var(--alert); }
+input.cell { width: 6em; max-width: 100%; font: inherit; text-align: center; color: var(--ink); background: var(--sheet);
+  border: 1px solid var(--rule); border-radius: 3px; padding: 2px 4px; }
+input.cell.right { border-color: var(--ok); } input.cell.wrong { border-color: var(--alert); }
+textarea { font: inherit; color: var(--ink); background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px;
+  padding: 8px 12px; min-height: 5.5em; resize: vertical; width: 100%; box-sizing: border-box; }
+.btn { align-self: flex-start; font-family: var(--sans); font-size: 14px; color: var(--sheet); background: var(--accent);
+  border: 0; border-radius: 4px; padding: 6px 16px; cursor: pointer; }
+details.key { background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 8px 14px; }
+details.key summary { font-family: var(--sans); font-size: 14px; cursor: pointer; color: var(--accent); }
+details.key > div { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+details.key p { margin: 0; } details.key ul { margin: 0; padding-left: 1.3em; }
+.rubric td { text-align: left; } .rubric td:first-child { text-align: center; white-space: nowrap; }
+.summary { border-top: 2px solid var(--ink); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.summary h2 { font-family: var(--sans); font-size: 17px; margin: 0; }
+.summary td { text-align: left; }
+</style>
+</head><body>
+<main class="sheet">
+  <header>
+    <span class="eyebrow">國中數學・會考題組（精簡版）・統計圖表 × 指數律</span>
+    <h1>小地震多，能量也多嗎？</h1>
+    <p class="lead">閱讀下列資料，回答第 1、2 題。第 1 題為選擇題，第 2 題為非選擇題。</p>
+  </header>
+
+  <section class="src">
+    <div class="doc">
+      <p>根據地震學家的研究，<b>單次</b>地震釋放的能量會隨規模快速增加：規模每增加 1，能量約變為原來的 32 倍；規模每增加 2，能量變為原來的 1000 倍。一次規模 6.0 的地震，釋放的能量約等於 1 顆廣島原子彈。</p>
+      <p>表（一）是某地區一年的地震次數統計（示意資料），為方便計算，各級地震都以表中的規模計算能量。圖（一）是依據表（一）畫出的兩張圓形圖。</p>
+    </div>
+    <div class="tbl">
+      <table>
+        <caption style="caption-side: top; font-family: var(--sans); font-size: 14px; color: var(--muted); padding-bottom: 4px;">表（一）</caption>
+        <thead><tr><th>規模</th><th>4.0</th><th>5.0</th><th>6.0</th><th>7.0</th><th>合計</th></tr></thead>
+        <tbody><tr><th>次數</th><td>1000</td><td>100</td><td>10</td><td>1</td><td>1111</td></tr></tbody>
+      </table>
+    </div>
+    <figure>
+      <svg viewBox="0 0 640 320" role="img" aria-label="圖一：左為次數占比圓形圖，右為一年總能量占比圓形圖，各塊以甲乙丙丁表示" font-family="Noto Sans TC, Microsoft JhengHei, sans-serif">
+        <g class="s-text" font-size="15" font-weight="700" text-anchor="middle">
+          <text x="160" y="24">次數占比</text><text x="480" y="24">一年總能量占比</text>
+        </g>
+        <g class="s-sep" stroke-width="1.5">
+          <path class="s-p1" d="M160,160 L160,65 A95,95 0 1,1 104.16,83.14 Z"/>
+          <path class="s-p2" d="M160,160 L104.16,83.14 A95,95 0 0,1 154.03,65.19 Z"/>
+          <path class="s-p3" d="M160,160 L154.03,65.19 A95,95 0 0,1 159.40,65.00 Z"/>
+          <path class="s-p4" d="M160,160 L159.40,65.00 A95,95 0 0,1 160,65 Z"/>
+        </g>
+        <text class="s-text" x="175" y="210" font-size="15" text-anchor="middle">90%</text>
+        <g font-size="13">
+          <rect class="s-p1" x="62" y="274" width="12" height="12"/><text class="s-text" x="80" y="285">規模 4.0：90%</text>
+          <rect class="s-p2" x="172" y="274" width="12" height="12"/><text class="s-text" x="190" y="285">規模 5.0：9%</text>
+          <rect class="s-p3" x="62" y="296" width="12" height="12"/><text class="s-text" x="80" y="307">規模 6.0：0.9%</text>
+          <rect class="s-p4" x="172" y="296" width="12" height="12"/><text class="s-text" x="190" y="307">規模 7.0：0.1%</text>
+        </g>
+        <line class="s-grid" x1="320" y1="40" x2="320" y2="300" stroke-width="1" stroke-dasharray="4,4"/>
+        <g class="s-sep" stroke-width="2">
+          <path class="s-pn" d="M480,160 L480,65 A95,95 0 0,1 520.45,74.04 Z"/>
+          <path class="s-pn" d="M480,160 L520.45,74.04 A95,95 0 1,1 385.19,154.03 Z"/>
+          <path class="s-pn" d="M480,160 L385.19,154.03 A95,95 0 0,1 386.68,142.20 Z"/>
+          <path class="s-pn" d="M480,160 L386.68,142.20 A95,95 0 0,1 480,65 Z"/>
+        </g>
+        <g class="s-text" font-size="14">
+          <text x="508" y="54">甲 7%</text>
+          <text x="505" y="206" text-anchor="middle">乙 69%</text>
+          <text x="378" y="150" text-anchor="end">丙 2%</text>
+          <text x="445" y="122" text-anchor="middle">丁 22%</text>
+        </g>
+        <text class="s-muted" x="480" y="290" font-size="13" text-anchor="middle">甲、乙、丙、丁分別代表四種規模之一</text>
+      </svg>
+    </figure>
+    <figcaption>圖（一）</figcaption>
+  </section>
+
+  <section class="src">
+    <div class="talk">
+      <div class="say"><b>小翰</b><p>圖（一）左邊顯示九成的地震都是規模 4.0，所以這個地區一年中大部分的地震能量，都是規模 4.0 的小地震釋放的。</p></div>
+    </div>
+  </section>
+
+  <!-- 第 1 題 -->
+  <section class="q" data-ans="B">
+    <div class="q-head"><b>1.</b><span class="stage">找元素・找關係・建系統</span><span class="kind">選擇題</span></div>
+    <p class="q-stem">圖（一）右邊的圓形圖中，代表規模 7.0 地震的是哪一塊？</p>
+    <div class="opts short">
+      <button class="opt" id="q1A" data-k="A">(A) 甲</button>
+      <button class="opt" id="q1B" data-k="B">(B) 乙</button>
+      <button class="opt" id="q1C" data-k="C">(C) 丙</button>
+      <button class="opt" id="q1D" data-k="D">(D) 丁</button>
+    </div>
+    <p class="fb" aria-live="polite"></p>
+  </section>
+
+  <!-- 第 2 題 -->
+  <section class="q">
+    <div class="q-head"><b>2.</b><span class="stage">反駁說理・驗證有效性</span><span class="kind">非選擇題</span></div>
+    <p class="q-stem">小翰的說法是否正確？請利用表（一）與文中資料，算出規模 4.0 與規模 7.0 的地震一年分別釋放約幾顆原子彈的能量，並說明你的理由。</p>
+    <textarea id="a2" aria-label="第 2 題作答區" placeholder="寫出計算過程、判斷與理由"></textarea>
+    <details class="key">
+      <summary>參考答案與評分規準</summary>
+      <div>
+        <p><b>不正確。</b></p>
+        <ul>
+          <li>規模 4.0 比規模 6.0 少 2，單次能量為 $\dfrac{1}{1000}$ 顆，一年共 $1000\times\dfrac{1}{1000}=1$ 顆。</li>
+          <li>規模 7.0 比規模 6.0 多 1，單次能量約 32 顆，一年共 $1\times32=32$ 顆。</li>
+          <li>規模 7.0 只發生 1 次，總能量卻是規模 4.0 的 32 倍，所以「次數最多」不代表「能量最多」。小翰把次數占比誤當成能量占比。</li>
+        </ul>
+        <div class="tbl"><table class="rubric">
+          <tr><th>得分</th><th>規準</th></tr>
+          <tr><td>2 分</td><td>判斷不正確，正確算出規模 4.0 約 1 顆、規模 7.0 約 32 顆，並說明總能量要看「次數 × 單次能量」</td></tr>
+          <tr><td>1 分</td><td>判斷不正確，但只算對其中一個數值；或兩個數值都算對，卻沒有說明理由</td></tr>
+          <tr><td>0 分</td><td>判斷正確，或判斷不正確但沒有計算也沒有理由</td></tr>
+        </table></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="summary">
+    <h2>教師解析</h2>
+    <details class="key">
+      <summary>展開：答案、命題設計與陷阱分析</summary>
+      <div>
+        <p><b>答案：</b>1.（B）乙　2. 不正確，詳見參考答案</p>
+        <p><b>【參考來源】</b>原題：古騰堡公式 $E=K\times(\sqrt{1000})^{M}$。會考架構：題組（1 選擇＋1 非選擇），統計圖表判讀結合指數律。</p>
+        <div class="tbl"><table>
+          <tr><th>題號</th><th>建模歷程</th><th>學生要做的事</th><th>主要陷阱</th></tr>
+          <tr><td>1</td><td>找元素→找關係→建系統</td><td>由文字規律推出單次能量 $\frac{1}{1000}$、$\frac{1}{32}$、1、32 顆，再乘次數得總能量 1、3.125、10、32，合計 46.125；$32\div46.125\approx69\%$，選乙</td><td>(C) 丙：把次數占比最小的規模 7.0 對應到最小塊；(D) 丁：誤用 ×10 或只算到規模 6.0 的 22%；(A) 甲：算錯單次能量</td></tr>
+          <tr><td>2</td><td>反駁說理→驗證有效性</td><td>用數據檢驗「次數多所以能量多」的推論</td><td>只說「不一定」而沒有計算；把規模 4.0 的單次能量算成 $\frac{1}{64}$（以為少 2 就是除以 $32\times2$）</td></tr>
+        </table></div>
+        <p><b>【自我稽核】</b>總能量 1 : 3.125 : 10 : 32，占比約 2%、7%、22%、69%，合計 100% ✓；次數占比 90%、9%、0.9%、0.1% ✓；規模 4.0 與 6.0 相差 2，單次能量 $\frac{1}{1000}$ ✓。</p>
+      </div>
+    </details>
+  </section>
+</main>
+
+<script>
+document.querySelectorAll('.q[data-ans]').forEach(function (q) {
+  var ans = q.dataset.ans, fb = q.querySelector('.fb');
+  q.querySelectorAll('.opt').forEach(function (b) {
+    b.addEventListener('click', function () {
+      q.querySelectorAll('.opt').forEach(function (o) { o.classList.remove('right', 'wrong'); });
+      var ok = b.dataset.k === ans;
+      b.classList.add(ok ? 'right' : 'wrong');
+      fb.className = 'fb ' + (ok ? 'good' : 'bad');
+      fb.textContent = ok ? '答對了！規模 7.0 只占次數的 0.1%，卻占總能量約 69%。' : '再想想：總能量 = 次數 × 單次能量，先算出每種規模一年的總能量。';
+    });
+  });
+});
+</script>
+
+</body></html>
