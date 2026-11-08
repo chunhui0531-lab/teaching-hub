@@ -22,6 +22,7 @@ teaching-hub/
 ├─ index.html              作品目錄頁（新增作品時一定要更新）
 ├─ AGENTS.md               本說明書
 ├─ assets/exam-sheet.css   會考題組試卷的共用樣式
+├─ docs/                   設計方法論、互動模式庫、各單元設計文件
 └─ <英文主題名>/index.html  每件作品一個資料夾
 ```
 
@@ -57,6 +58,13 @@ teaching-hub/
 - 非選擇題附「參考答案與評分規準」（2／1／0 分），收在 `<details>` 裡，預設收合。
 - 「教師解析」要包含：答案、參考來源、每個選項的**陷阱分析**、【自我稽核】（把所有數字重新驗算一次）。
 - 情境盡量取自真實時事（例：0403 花蓮地震），引用的規範或數據要寫出來源。
+
+### 設計新的互動網頁時的流程
+
+1. 先依 `docs/design-methodology.md` 做內容分析（三版本對照、迷失節點、教學路徑）。
+2. **分析完成後**，才去 `docs/interaction-patterns.md`（互動模式庫）挑選適合的機制。順序不可顛倒，否則會讓「好玩的機制」蓋過內容判斷。
+3. 參考 `docs/design/` 裡既有的單元設計文件格式（N-7-3、N-7-4、N-7-5），產出新單元的設計文件。
+4. 設計文件提到的舊檔名對照：`arc_unit1b_track.html` → `arc-length-units/unit1b-track.html`，`arc_unit4b_science_1.html` → `arc-length-units/unit4b-science-report.html`，`arc_unit5b_animation.html` → `arc-length-units/unit5b-inscribed-angle.html`。
 
 ## 6. 隱私與安全（一定要遵守）
 
