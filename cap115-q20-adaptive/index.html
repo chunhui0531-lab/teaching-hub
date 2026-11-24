@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>會考第 20 題：先作答，再補強</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8; --panel:#fff; --ink:#1d232b; --muted:#5b6470; --line:#d9dde2; --soft:#f1f3f5;
+  --accent:#1f5f99; --accent-soft:#e8f0f8; --ok:#2c7a4b; --ok-soft:#e6f4ea; --alert:#c23a32; --alert-soft:#fbeceb;
+  --mB:#7a4fa0; --mL:#1f5f99; --mC:#c9622f; --mK:#ffe066; --mK-ink:#5c4600; --on-accent:#fff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14181d; --panel:#1b2027; --ink:#e6e9ee; --muted:#9aa4b1; --line:#343c47; --soft:#232a33;
+    --accent:#6fa8dc; --accent-soft:#1f2b38; --ok:#6cc28f; --ok-soft:#1d3326; --alert:#ef7a70; --alert-soft:#3a2120;
+    --mB:#c3a2e3; --mL:#6fa8dc; --mC:#e88a5a; --mK:#7a6410; --mK-ink:#ffe8a3; --on-accent:#0f1720; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14181d; --panel:#1b2027; --ink:#e6e9ee; --muted:#9aa4b1; --line:#343c47; --soft:#232a33;
+  --accent:#6fa8dc; --accent-soft:#1f2b38; --ok:#6cc28f; --ok-soft:#1d3326; --alert:#ef7a70; --alert-soft:#3a2120;
+  --mB:#c3a2e3; --mL:#6fa8dc; --mC:#e88a5a; --mK:#7a6410; --mK-ink:#ffe8a3; --on-accent:#0f1720; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.7;font-size:18px}
+.wrap{max-width:820px;margin:0 auto;padding:16px 14px 40px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+h1{font-size:clamp(1.25rem,3vw,1.6rem);font-weight:900;margin:0}
+button{font:inherit;color:inherit}
+.btn{min-height:44px;padding:6px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:focus-visible,.tok:focus-visible,input:focus-visible,.key:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tools{display:flex;gap:6px}
+.tools .btn{padding:6px 12px;font-size:.92rem}
+
+/* progress */
+.prog{display:flex;gap:6px;margin:14px 0}
+.prog div{flex:1;text-align:center;font-size:.9rem;padding:6px 4px;border-radius:10px;background:var(--panel);border:2px solid var(--line);color:var(--muted);font-weight:700}
+.prog div.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.prog div.done{border-color:var(--ok);color:var(--ok)}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h2{margin:0 0 4px;font-size:1.2rem}
+.goal{margin:0 0 12px;color:var(--muted);font-size:.95rem}
+.hidden{display:none!important}
+.nav{display:flex;justify-content:space-between;margin-top:14px;gap:8px}
+
+/* problem */
+.paper{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--soft);font-size:1.1rem;line-height:2.5}
+.tok{border-radius:4px;padding:3px 2px;cursor:pointer;border-bottom:2px dotted var(--muted);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.tok:hover{background:var(--accent-soft)}
+.tok.got{cursor:default;border-bottom-color:transparent}
+.tok.got:hover{background:none}
+.m-K{background:var(--mK)!important;color:var(--mK-ink)}
+.m-L{text-decoration:underline;text-decoration-color:var(--mL);text-decoration-thickness:3px;text-underline-offset:7px}
+.m-C{border:2.5px solid var(--mC)!important;border-radius:999px;padding:1px 8px}
+.m-B{outline:2.5px solid var(--mB);outline-offset:2px}
+.shake{animation:shake .35s}
+@keyframes shake{25%,75%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
+.tok.shake{display:inline-block}
+.palette{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+@media(max-width:600px){.palette{grid-template-columns:repeat(2,1fr)}}
+.pen{min-height:58px;border-radius:12px;border:2px solid var(--line);background:var(--panel);cursor:pointer;text-align:left;padding:6px 10px;line-height:1.3}
+.pen b{font-size:1rem}.pen small{display:block;color:var(--muted);font-size:.8rem}
+.pen .cnt{float:right;font-size:.85rem;color:var(--muted)}
+.pen.on{border-color:var(--ink);box-shadow:0 0 0 3px var(--accent-soft)}
+.pen.full .cnt{color:var(--ok);font-weight:700}
+.msg{min-height:1.7em;margin-top:10px;font-size:.98rem}
+.msg.ok{color:var(--ok)}.msg.no{color:var(--alert)}
+
+/* step 2 */
+.frow{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
+.frow:first-of-type{border-top:none}
+.frow .n{font-size:1.5rem;font-weight:900;text-align:center;padding-top:4px}
+.irow{display:flex;gap:6px}
+.irow .btn{flex:none;white-space:nowrap}
+input{font:inherit;font-size:1.05rem;min-height:44px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);width:100%}
+input:disabled{background:var(--soft)}
+.fb{font-size:.9rem;margin-top:4px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--alert)}
+.pairs{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;font-size:.95rem}
+.pairs span{background:var(--soft);border-radius:6px;padding:0 8px}
+.pairs span.hl{background:var(--mK);color:var(--mK-ink);font-weight:700}
+.verdict{margin-top:6px;font-weight:700}
+.note{background:var(--accent-soft);border-radius:10px;padding:10px 14px;margin-top:12px}
+.note p{margin:2px 0}
+
+/* step 3 */
+.lockq{font-size:1.15rem;margin:6px 0 8px}
+.keys{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.key{width:76px;height:64px;border-radius:12px;border:2px solid var(--line);background:var(--panel);font-size:1.4rem;font-weight:900;cursor:pointer;line-height:1.1}
+.key small{display:block;font-size:.75rem;color:var(--muted);font-weight:400}
+.key.on{border-color:var(--accent);background:var(--accent-soft)}
+.key.good{border-color:var(--ok);background:var(--ok-soft)}
+.key:disabled{cursor:default}
+.sub{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+.rule{background:var(--ok-soft);border-radius:10px;padding:10px 14px;margin-top:12px;font-weight:700;text-align:center}
+
+/* step 4 */
+.judge{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.judge:first-of-type{border-top:none}
+.judge .row{display:flex;gap:6px}
+.judge .btn.sel-ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);font-weight:700}
+.summary{border:2px solid var(--accent);border-radius:14px;padding:14px 16px;margin-top:14px}
+.summary h3{margin:0 0 8px}
+.summary ol{margin:0;padding-left:1.4em}
+.summary li{margin:4px 0}
+.ss{border-left:4px solid var(--line);padding:4px 0 4px 12px;margin:10px 0}
+.ss.on{border-left-color:var(--accent)}.ss.ok{border-left-color:var(--ok)}
+.ss .lab{font-weight:700;color:var(--accent);margin-right:6px}
+.inl{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}
+.inl input{width:110px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.chip{min-height:44px;min-width:64px;border-radius:10px;border:2px solid var(--line);background:var(--panel);font-size:1.1rem;font-weight:700;cursor:pointer;padding:0 12px}
+.chip.del{text-decoration:line-through;color:var(--muted);border-style:dashed;cursor:default}
+.chip.yes{border-color:var(--ok);color:var(--ok);background:var(--ok-soft);cursor:default}
+.chip.no{border-color:var(--alert);color:var(--alert);text-decoration:line-through;cursor:default}
+.t5{font-size:1rem;margin:4px 0 8px}.t5 b{color:var(--accent)}
+.opts5{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:560px){.opts5{grid-template-columns:1fr}}
+.opts5 .btn{text-align:left;min-height:48px}
+.opts5 .btn.right{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);font-weight:700}
+.opts5 .btn.wrong{border-color:var(--alert);color:var(--alert);text-decoration:line-through}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+/* ================= 活潑風格層（只改外觀） ================= */
+:root{--c1:#8b5cf6;--c2:#0ea5e9;--c3:#f97316;--c4:#10b981;--c5:#ec4899;--pop:#fff7d6;--shadow:0 6px 0 rgba(29,35,43,.08),0 10px 24px rgba(29,35,43,.06)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--pop:#3a3220;--shadow:0 6px 0 rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--pop:#3a3220;--shadow:0 6px 0 rgba(0,0,0,.35)}
+body{background-color:var(--bg);background-image:radial-gradient(rgba(139,92,246,.10) 1.6px,transparent 1.6px),radial-gradient(rgba(14,165,233,.08) 1.6px,transparent 1.6px);background-size:28px 28px;background-position:0 0,14px 14px}
+.top{position:relative;overflow:hidden;background:linear-gradient(120deg,#8b5cf6,#ec4899 45%,#f97316);border-radius:20px;padding:16px 18px;box-shadow:var(--shadow)}
+.top h1{color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.15);letter-spacing:.03em}
+.top h1::before{content:"🔍";margin-right:8px}
+.top::after{content:"✦ 2 × 44 ✦ 88 ✦ 3 × 13 ✦";position:absolute;right:16px;bottom:-4px;font-size:2.2rem;font-weight:900;color:rgba(255,255,255,.14);white-space:nowrap;pointer-events:none}
+.top .tools{position:relative;z-index:1}
+.top .tools .btn{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5);color:#fff;backdrop-filter:blur(4px)}
+.top .tools .btn:hover{background:rgba(255,255,255,.35)}
+/* progress */
+.prog div{border-radius:999px;border-width:2px;transition:transform .2s}
+.prog div:nth-child(1){--c:var(--c1)}.prog div:nth-child(2){--c:var(--c2)}.prog div:nth-child(3){--c:var(--c3)}.prog div:nth-child(4){--c:var(--c4)}.prog div:nth-child(5){--c:var(--c5)}
+.prog div.on{border-color:var(--c);color:#fff;background:var(--c);transform:translateY(-2px) scale(1.04);box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.prog div.done{border-color:var(--c);color:var(--c);background:var(--panel)}
+.prog div.done::after{content:" ⭐"}
+/* cards per step */
+#s1{--c:var(--c1)}#s2{--c:var(--c2)}#s3{--c:var(--c3)}#s4{--c:var(--c4)}#s5{--c:var(--c5)}
+.card{border:2px solid var(--line);border-top:8px solid var(--c,var(--accent));border-radius:20px;box-shadow:var(--shadow);animation:rise .35s ease-out}
+@keyframes rise{from{transform:translateY(12px)}to{transform:none}}
+.card h2{color:var(--c,var(--accent));font-size:1.3rem;font-weight:900}
+.goal{background:var(--pop);border-radius:12px;padding:8px 12px;color:var(--ink)!important}
+.goal::before{content:"💡 "}
+/* buttons */
+.btn{border-radius:999px;border-width:2px;transition:transform .12s,box-shadow .12s}
+.btn:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 4px 0 rgba(0,0,0,.08)}
+.btn:not(:disabled):active{transform:translateY(1px)}
+.btn.primary{background:linear-gradient(135deg,var(--c,var(--accent)),var(--accent));border-color:transparent;color:#fff}
+#next.btn.primary{background:linear-gradient(135deg,#8b5cf6,#ec4899);font-weight:900;padding:6px 22px}
+/* BLUCK pens */
+.pen{border-radius:16px;transition:transform .15s}
+.pen[data-k="B"]{background:rgba(122,79,160,.10)}.pen[data-k="L"]{background:rgba(31,95,153,.10)}
+.pen[data-k="C"]{background:rgba(201,98,47,.10)}.pen[data-k="K"]{background:rgba(255,224,102,.30)}
+.pen:hover{transform:translateY(-3px) rotate(-1deg)}
+.pen.on{transform:translateY(-3px);box-shadow:0 0 0 3px var(--c1)}
+.pen.full{border-color:var(--ok)}.pen.full .cnt::after{content:" 🎉"}
+.paper{border:2px dashed var(--line);border-radius:16px;background:var(--panel)}
+.tok.got{animation:pop .3s}
+@keyframes pop{50%{transform:scale(1.12)}}
+/* sub-steps */
+.ss{border-left-width:6px;border-radius:0 14px 14px 0;background:rgba(14,165,233,.05);padding:8px 12px;margin:10px 0}
+.ss.on{border-left-color:var(--c2);background:rgba(14,165,233,.10)}
+.ss.ok{border-left-color:var(--ok);background:rgba(16,185,129,.07)}
+.ss .lab{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--c2);color:#fff;font-size:.9rem}
+.ss.ok .lab{background:var(--ok)}
+#s5 .ss.on{border-left-color:var(--c5);background:rgba(236,72,153,.08)}#s5 .ss .lab{background:var(--c5)}#s5 .ss.ok .lab{background:var(--ok)}
+.chip{border-radius:999px;transition:transform .15s}
+.chip:not(.del):not(.yes):not(.no):hover{transform:translateY(-3px);border-color:var(--c2)}
+.chip.yes{animation:pop .35s}.chip.yes::after{content:" ✓"}
+.chip.no{animation:pop .35s}
+.pairs span{border-radius:999px;padding:1px 10px}
+.pairs span.hl{box-shadow:0 0 0 3px rgba(255,200,0,.45);animation:pop .4s}
+/* keys */
+.key{border-radius:18px;border-width:3px;box-shadow:0 4px 0 rgba(0,0,0,.08);transition:transform .15s}
+.key:nth-child(1){background:rgba(139,92,246,.10)}.key:nth-child(2){background:rgba(14,165,233,.10)}
+.key:nth-child(3){background:rgba(249,115,22,.10)}.key:nth-child(4){background:rgba(236,72,153,.10)}
+.key::before{content:"🔑";display:block;font-size:.8rem}
+.key:not(:disabled):hover{transform:translateY(-3px) rotate(-3deg)}
+.key.on{transform:translateY(-4px);border-color:var(--c3)}
+.key.good{animation:pop .4s}
+.rule{background:linear-gradient(120deg,rgba(16,185,129,.18),rgba(14,165,233,.18));border:2px solid var(--ok);border-radius:14px}
+.rule::before{content:"✨ "}
+.fb.ok,.msg.ok{animation:rise .25s}
+.judge{border-radius:12px;padding:10px 8px}
+.summary{border:3px solid transparent;border-radius:20px;background:linear-gradient(var(--panel),var(--panel)) padding-box,linear-gradient(120deg,#8b5cf6,#ec4899,#f97316) border-box;animation:rise .4s}
+.summary h3{font-size:1.2rem}
+.note{border-radius:14px;background:linear-gradient(120deg,rgba(14,165,233,.12),rgba(139,92,246,.12))}
+.opts5 .btn{border-radius:16px}
+@media(max-width:540px){
+  .prog{gap:4px}.prog div{font-size:.74rem;padding:5px 2px;white-space:nowrap}
+  .prog div.done::after{content:""}.prog div.done{background:var(--ok-soft)}
+  .judge{grid-template-columns:1fr}.judge .row{justify-content:flex-end}
+  .top::after{display:none}
+}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+.gcard{border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:12px;background:var(--panel)}
+.gcard h3{margin:0 0 8px;font-size:1.1rem;color:var(--c2)}
+.ex{border-radius:12px;padding:8px 12px;margin:8px 0}
+.ex.pos{background:rgba(16,185,129,.10);border-left:5px solid var(--ok)}
+.ex.neg{background:rgba(249,115,22,.10);border-left:5px solid var(--c3)}
+.ex .tagx{font-weight:900;margin-right:6px}
+.opts2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+@media(max-width:560px){.opts2{grid-template-columns:1fr}}
+.opts2 .btn{text-align:left;min-height:48px;border-radius:16px}
+.opts2 .btn.right{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);font-weight:700}
+.opts2 .btn.wrong{border-color:var(--alert);color:var(--alert);text-decoration:line-through}
+.opts2 .btn.right:disabled,.opts2 .btn.wrong:disabled{opacity:1}
+.why .btn{display:block;width:100%;text-align:left;margin-top:6px;border-radius:14px}
+.paper.static .tok{cursor:default;border-bottom-color:transparent}
+.timebox{font-size:.95rem;color:var(--muted);margin-top:6px}
+.pb{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.pcol{display:flex;flex-direction:column;align-items:center;gap:0;border:2px solid var(--line);border-radius:14px;padding:4px;background:var(--panel)}
+.pcol .lnk{width:3px;height:12px;background:var(--line)}
+.pc{display:flex;align-items:center;justify-content:center;min-height:40px;min-width:50px;border-radius:10px;background:var(--soft);font-size:1.05rem;font-weight:700}
+.pc:disabled{cursor:default}
+.pcol.p2{border-color:var(--ok);background:var(--ok-soft)}
+.pcol.p2 .lnk{background:var(--ok)}
+.pcol.pk{border-color:var(--c3)}
+.pc.hit{background:var(--ok);color:#fff}
+.pc.kk{background:rgba(249,115,22,.25)}
+.plab{font-size:.72rem;color:var(--muted);text-align:center}
+.pitem{border-top:1px dashed var(--line);padding-top:8px;margin-top:8px}
+.pitem:first-of-type{border-top:none}
+.pitem .ttl{font-weight:900}
+.rankrow{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.rk{min-height:48px;min-width:56px;border-radius:12px;border:2px solid var(--line);background:var(--panel);font-size:1.05rem;font-weight:700;cursor:pointer;position:relative;padding:4px 10px 14px}
+.rk small{position:absolute;left:0;right:0;bottom:1px;font-size:.68rem;font-weight:500;color:var(--muted)}
+.rk.k2{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.rk.k{border-color:var(--c3);background:rgba(249,115,22,.12);color:var(--c3)}
+.rk:disabled{cursor:default;opacity:1}
+.think{background:var(--pop);border-radius:12px;padding:8px 12px;margin:6px 0}
+.top .tools a.btn{display:inline-flex;align-items:center;text-decoration:none;background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5);color:#fff;font-size:.92rem;padding:6px 12px}
+.top .tools a.detective{background:#fff;color:#c2410c;font-weight:900;border-color:#fff}
+.top .tools{flex-wrap:wrap;justify-content:flex-end}
+.morelink{display:inline-flex;align-items:center;gap:6px;margin-top:10px;min-height:44px;padding:6px 16px;border-radius:999px;border:2px solid var(--c3);color:var(--c3);font-weight:700;text-decoration:none}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="wrap">
+  <div class="top">
+    <h1>會考第 20 題：先作答，再補強</h1>
+    <div class="tools"><a class="btn detective" href="https://chunhui0531-lab.github.io/teaching-hub/factor-pair-detective/" target="_blank" rel="noopener">🕵️ 因數配對偵探</a><button class="btn" id="themeBtn">◐ 深淺色</button><button class="btn" id="fsBtn">⛶ 全螢幕</button></div>
+  </div>
+  <div class="prog" id="prog"><div>① BLUCK 讀題</div><div>② 自己作答</div><div>③ 相似題</div></div>
+
+  <section class="card" id="s1">
+    <h2>① 抓關鍵：用 BLUCK 讀題</h2>
+    <p class="goal">選一支筆，點題目中有虛線的地方。全部標完就能進下一步。</p>
+    <div class="palette" id="palette"></div>
+    <div class="paper" id="paper"></div>
+    <div class="msg" id="msg1"></div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card hidden" id="s2">
+    <h2>② 自己作答</h2>
+    <p class="goal">不給提示，用你標好的重點自己解題。答對就通過；答錯會針對你的想法補強。</p>
+    <div class="paper static" id="paper2"></div>
+    <div class="opts2" id="opts2"></div>
+    <div class="msg" id="msg2"></div>
+    <div id="area2"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card hidden" id="s3">
+    <h2>③ 相似題：自己來</h2>
+    <p class="goal">一樣先用 BLUCK 標重點，再直接作答。</p>
+    <div class="palette" id="palette3"></div>
+    <div class="paper" id="paper3"></div>
+    <div class="msg" id="msg3"></div>
+    <div class="hidden" id="ans3">
+      <div class="opts2" id="opts3"></div>
+      <div class="msg" id="msg3b"></div>
+      <div id="area3"></div>
+    </div>
+  </section>
+
+  <div class="nav"><button class="btn" id="prev">← 上一步</button><button class="btn primary" id="next" disabled>下一步 →</button></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+$('themeBtn').onclick=()=>{const r=document.documentElement;const d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.dataset.theme=d?'light':'dark';};
+$('fsBtn').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{});}catch(e){}};
+const shake=el=>{el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');};
+
+/* ---------- 彩帶（尊重減少動態） ---------- */
+const cv=$('confetti'),cx=cv.getContext('2d');let parts=[],raf=null;
+function confetti(k=70){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;cv.width=innerWidth;cv.height=innerHeight;
+  const cols=['#8b5cf6','#0ea5e9','#f97316','#10b981','#ec4899','#facc15'];
+  for(let i=0;i<k;i++)parts.push({x:innerWidth*(.3+Math.random()*.4),y:innerHeight*.3,vx:(Math.random()-.5)*12,vy:-Math.random()*10-4,r:Math.random()*6+4,c:cols[i%6],a:Math.random()*6,l:0});
+  if(!raf)loop();}
+function loop(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.vy+=.32;p.x+=p.vx;p.y+=p.vy;p.a+=.2;p.l++;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);cx.restore();});
+  parts=parts.filter(p=>p.y<cv.height+20&&p.l<200);raf=parts.length?requestAnimationFrame(loop):(cx.clearRect(0,0,cv.width,cv.height),null);}
+/* ---------- step control ---------- */
+let step=1,doneSteps=new Set();const T0=Date.now();
+function show(n){step=n;[1,2,3].forEach(i=>$('s'+i).classList.toggle('hidden',i!==n));
+  [...$('prog').children].forEach((d,i)=>{d.className=(i+1===n?'on':'')+(doneSteps.has(i+1)?' done':'');});
+  $('prev').style.visibility=n===1?'hidden':'visible';$('next').style.visibility=n===3?'hidden':'visible';
+  $('next').disabled=!doneSteps.has(n);if(n===2)$('paper2').innerHTML=$('paper').innerHTML;scrollTo({top:0});}
+function complete(n){if(!doneSteps.has(n))confetti(n===3?160:70);doneSteps.add(n);if(step===n){$('next').disabled=false;[...$('prog').children][n-1].classList.add('done');}}
+$('prev').onclick=()=>show(step-1);$('next').onclick=()=>show(step+1);
+/* ---------- BLUCK（可重複使用） ---------- */
+const PENS={B:{name:'B 框',desc:'要回答的問題'},L:{name:'L・U 劃線',desc:'已知條件（整句）'},C:{name:'C 圈',desc:'數字'},K:{name:'K 螢光',desc:'關鍵字'}};
+const HINT={B:'這是題目要我們回答的問題',L:'這是已知條件的一部分',C:'這是要注意的數字',K:'這個詞會改變答案，是關鍵字'};
+function bluck(paper,palette,msg,P,need,doneText,onDone){
+  const have={B:0,L:0,C:0,K:0},marks=[],lined={};let pen='B';
+  const say=(t,c)=>{msg.className='msg '+c;msg.innerHTML=t;};
+  function pal(){palette.innerHTML=Object.entries(PENS).map(([k,p])=>`<button class="pen${k===pen?' on':''}${have[k]===need[k]?' full':''}" data-k="${k}"><span class="cnt">${have[k]}/${need[k]}</span><b>${p.name}</b><small>${p.desc}</small></button>`).join('');
+    palette.querySelectorAll('.pen').forEach(b=>b.onclick=()=>{pen=b.dataset.k;pal();});}
+  function draw(){let h='';P.forEach((t,i)=>{
+      if(typeof t==='string'){h+=t;return;}
+      const ms=marks[i]||new Set(),lineOn=t.g&&lined[t.g],fin=t.k==='L'?lineOn:ms.has(t.k);
+      h+=`<span class="tok${[...ms].map(m=>' m-'+m).join('')}${lineOn?' m-L':''}${fin?' got':''}" data-i="${i}" ${fin?'':'role="button" tabindex="0"'}>${t.h}</span>`;});
+    paper.innerHTML=h;
+    paper.querySelectorAll('.tok:not(.got)').forEach(el=>{const go=()=>tap(+el.dataset.i,el);el.onclick=go;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});}
+  function tap(i,el){const t=P[i];
+    if(pen==='L'&&t.g){if(lined[t.g]){say('這一句已經劃過了，換別支筆試試。','no');return;}
+      lined[t.g]=true;have.L++;say(`✓ 劃好第 ${have.L} 組條件：整句都是已知條件，不能只抄數字。`,'ok');}
+    else if(t.k===pen&&pen!=='L'){(marks[i]=marks[i]||new Set()).add(pen);have[pen]++;say({B:'✓ 這就是要回答的問題。',C:'✓ 圈到數字了。',K:'✓ 關鍵字！'}[pen],'ok');}
+    else{shake(el);say(`這裡不是用 ${PENS[pen].name}。提示：${HINT[t.k]}。`,'no');return;}
+    pal();draw();
+    if(Object.keys(need).every(k=>have[k]===need[k])){say(doneText,'ok');onDone();}}
+  pal();draw();
+}
+
+/* ---------- 共用 ---------- */
+const factors=n=>{const s=[],b=[];for(let i=1;i*i<=n;i++)if(n%i===0){s.push(i);if(i*i!==n)b.unshift(n/i);}return s.concat(b);};
+const lpf=n=>{const f=factors(n);return f[f.length-2];};
+const pairs=n=>{const f=factors(n);return f.slice(0,Math.ceil(f.length/2)).map(a=>`${a}×${n/a}`).join('、');};
+const OPT=['(A) 甲、乙皆正確','(B) 甲、乙皆錯誤','(C) 甲正確，乙錯誤','(D) 甲錯誤，乙正確'];
+const path=[];   // 記錄學生走過的路徑，最後顯示
+const fmtTime=()=>{const s=Math.round((Date.now()-T0)/1000);return `${Math.floor(s/60)} 分 ${s%60} 秒`;};
+
+/* 一正一反的補強卡：pos 正例(直接給)，neg 反例(學生填一格) */
+function guide(box,g,onDone){
+  const el=document.createElement('div');el.className='gcard';
+  el.innerHTML=`<h3>🔍 ${g.title}</h3>
+    <div class="ex pos"><span class="tagx">正例</span>${g.pos.n} 的因數配對：${pairs(g.pos.n)}<br>除了 ${g.pos.n} 以外最大的因數是 <b>${lpf(g.pos.n)}</b> ✓ ${g.pos.note}</div>
+    <div class="ex neg"><span class="tagx">${g.negLabel||'反例'}</span>${g.neg.n} 的因數：${factors(g.neg.n).join(', ')}<br>
+      除了 ${g.neg.n} 以外最大的因數是 <span class="inl"><input type="number" aria-label="${g.neg.n} 除了自己以外最大的因數"><button class="btn">確定</button></span>
+      <div class="fb"></div></div>
+    <div class="hidden res"></div>`;
+  box.appendChild(el);
+  const inp=el.querySelector('input'),btn=el.querySelector('.ex.neg .btn'),fb=el.querySelector('.ex.neg .fb'),res=el.querySelector('.res');
+  inp.focus({preventScroll:true});el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
+  const go=()=>{if(!inp.value)return;const v=+inp.value,n=g.neg.n,ans=lpf(n);
+    if(v!==ans){fb.className='fb no';fb.innerHTML=v===n?`要「除了 ${n} 自己」以外喔`:(g.trap&&v===g.trap?`${v} 是 ${n} 的因數沒錯，但它是「除了 ${n} 以外<b>最大</b>」的嗎？`:'從最大的那一端往回數第二個。');return;}
+    inp.disabled=btn.disabled=true;fb.className='fb ok';fb.innerHTML=`✓ 是 ${ans}`;
+    res.classList.remove('hidden');res.innerHTML=`<div class="note">${g.ok}</div><div class="rule">${g.rule}</div><div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn primary">繼續 →</button></div>`;
+    res.querySelector('.btn').onclick=()=>{res.querySelector('.btn').disabled=true;onDone();};};
+  btn.onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go();};
+}
+
+/* 排名卡：把反例的因數由大到小排，讓學生親手點出「第二大」 */
+function guideRank(box,g,onDone){
+  const n=g.neg.n,k=g.k,desc=factors(n).slice().reverse(),second=desc[1],kRank=desc.indexOf(k)+1;
+  const posDesc=factors(g.pos.n).slice().reverse();
+  const el=document.createElement('div');el.className='gcard';
+  el.innerHTML=`<h3>🔍 ${g.title}</h3>
+    ${g.think?`<div class="think">${g.think}</div>`:''}
+    <div class="ex neg"><span class="tagx">檢查</span>題目說 ${k} 是 <i>${g.sym}</i>「除了自己以外<b>最大</b>」的因數，也就是<b>第二大</b>的因數。<br>
+      把 ${n} 的因數<b>由大到小</b>排好了，請點出 ${n} 的<b>第二大</b>因數：
+      <div class="rankrow">${desc.map(v=>`<button class="rk" data-v="${v}">${v}<small></small></button>`).join('')}</div>
+      <div class="fb"></div></div>
+    <div class="hidden res"></div>`;
+  box.appendChild(el);el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
+  const fb=el.querySelector('.fb'),res=el.querySelector('.res'),rks=[...el.querySelectorAll('.rk')];
+  const label=()=>rks.forEach((b,i)=>{b.querySelector('small').textContent=`第${i+1}大`;b.disabled=true;if(i===1)b.classList.add('k2');if(+b.dataset.v===k&&i!==1)b.classList.add('k');});
+  rks.forEach(b=>b.onclick=()=>{const v=+b.dataset.v;
+    if(v===second){label();fb.className='fb ok';
+      fb.innerHTML=`✓ 第二大是 <b>${second}</b>。而 ${k} 在 ${n} 裡只排<b>第 ${kRank} 大</b>，不是第二大！`;
+      res.classList.remove('hidden');
+      res.innerHTML=`<div class="ex pos"><span class="tagx">對照</span>${g.pos.n} 的因數由大到小：${posDesc.slice(0,4).map((v,i)=>i===1?`<b>${v}</b>（第2大）`:v).join('、')}……<br>${k} 剛好是第二大 ✓，所以 ${g.pos.n} 才是 <i>${g.sym}</i>。</div>
+        <div class="note">${g.ok}</div><div class="rule">${g.rule}</div><div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn primary">繼續 →</button></div>`;
+      res.querySelector('.btn').onclick=()=>{res.querySelector('.btn').disabled=true;onDone();};}
+    else if(v===n){fb.className='fb no';fb.innerHTML=`${n} 是第 1 大，題目要的是「除了自己以外」的最大，也就是第 2 個。`;shake(b);}
+    else if(v===k){fb.className='fb no';fb.innerHTML=`你點了 ${k}，這正是很多人選錯的原因！${k} 是 ${n} 的因數沒錯，但數數看：${desc.slice(0,kRank).map((x,i)=>`第${i+1}大 ${x}`).join('、')}。${k} 排第幾？`;shake(b);}
+    else{fb.className='fb no';fb.innerHTML=`從最大的 ${n} 開始往下數，第 2 個是哪一個？`;shake(b);}});
+}
+
+/* 配對板：只列出因數配對，由學生判斷，不直接給答案 */
+function pairBoard(host,it,k,onDone){
+  const n=it.n,f=factors(n),half=Math.ceil(f.length/2),ans=f[f.length-2],yes=ans===k;
+  const d=document.createElement('div');d.className='pitem';
+  d.innerHTML=`<div class="ttl">${it.title}</div>
+    <div class="plab" style="text-align:left">${n} 的因數兩兩配對（上排小、下排大，相乘 ＝ ${n}）</div>
+    <div class="pb">${f.slice(0,half).map((a,i)=>`<div class="pcol"><span class="pc">${a}</span>${a*a===n?'':`<span class="lnk"></span><span class="pc">${n/a}</span>`}<span class="plab">第 ${i+1} 組</span></div>`).join('')}</div>
+    <div class="row"><button class="btn" data-a="1">可以</button><button class="btn" data-a="0">不可以</button></div>
+    <div class="fb"></div>`;
+  host.appendChild(d);d.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'});
+  const fb=d.querySelector('.fb');let tries=0,done=false;
+  d.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{if(done)return;const pick=b.dataset.a==='1';
+    if(pick===yes){done=true;b.classList.add('sel-ok');d.querySelectorAll('[data-a]').forEach(x=>x.disabled=true);fb.className='fb ok';fb.innerHTML='✓ 判斷正確';onDone();}
+    else{tries++;shake(b);fb.className='fb no';
+      fb.innerHTML=tries===1?`再想想：題目要 ${k} 是「除了自己以外<b>最大</b>」的因數。除了 ${n} 自己，${n} 最大的因數是哪一個？`
+        :`看第 1 組是 ${n} 自己，除了它以外，最大的因數在第幾組？那個數是 ${k} 嗎？`;}});
+}
+function guidePairs(box,g,onDone){
+  const el=document.createElement('div');el.className='gcard';
+  el.innerHTML=`<h3>🔍 ${g.title}</h3>${g.think?`<div class="think">${g.think}</div>`:''}<div class="host"></div><div class="hidden res"></div>`;
+  box.appendChild(el);el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
+  const host=el.querySelector('.host'),res=el.querySelector('.res');
+  const step=i=>{if(i<g.items.length){pairBoard(host,g.items[i],g.k,()=>setTimeout(()=>step(i+1),250));return;}
+    res.classList.remove('hidden');
+    res.innerHTML=(g.obs?`<div class="why" style="margin-top:8px"><p style="margin:4px 0"><b>${g.obs.q}</b></p>${g.obs.opts.map((o,j)=>`<button class="btn" data-o="${j}">${o[0]}</button>`).join('')}<div class="fb"></div></div>`:'')+`<div class="after ${g.obs?'hidden':''}"><div class="note">${g.ok}</div><div class="rule">${g.rule}</div><div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn primary go">繼續 →</button></div></div>`;
+    const after=res.querySelector('.after');
+    res.querySelector('.go').onclick=()=>{res.querySelector('.go').disabled=true;onDone();};
+    if(g.obs){let dn=false;res.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{if(dn)return;const o=g.obs.opts[+b.dataset.o],fb=res.querySelector('.why .fb');
+      if(o[1]){dn=true;b.classList.add('sel-ok');fb.className='fb ok';fb.innerHTML=o[2];after.classList.remove('hidden');}else{shake(b);fb.className='fb no';fb.innerHTML=o[2];}});}
+  };
+  step(0);
+}
+function runGuides(box,list,onDone){if(!list.length){onDone();return;}const g=list[0],next=()=>runGuides(box,list.slice(1),onDone);g.type==='pairs'?guidePairs(box,g,next):g.type==='rank'?guideRank(box,g,next):guide(box,g,next);}
+
+
+/* 作答 + 一鍵說理 + 依選項分流 */
+function quiz(cfg){
+  const {opts,area,msg,correct,guidesFor,why,finish,explain}=cfg;let tries=0,locked=false;
+  opts.innerHTML=OPT.map((o,i)=>`<button class="btn" data-i="${i}">${o}</button>`).join('');
+  const btns=[...opts.querySelectorAll('.btn')];
+  const lock=v=>{locked=v;btns.forEach(b=>b.disabled=v||b.classList.contains('wrong'));};
+  const say=(t,c)=>{msg.className='msg '+c;msg.innerHTML=t;};
+  const retry=()=>{lock(false);btns.forEach(b=>{if(!b.classList.contains('wrong'))b.disabled=false;});say('💪 現在再選一次答案。','ok');opts.scrollIntoView({behavior:'auto',block:'center'});};
+  const pass=(how)=>{lock(true);path.push(how);finish(how);};
+  btns.forEach(b=>b.onclick=()=>{if(locked)return;const i=+b.dataset.i;
+    if(i===correct){b.classList.add('right');
+      if(tries===0){lock(true);say('✓ 答對了！最後確認一下你的理由：','ok');
+        const w=document.createElement('div');w.className='gcard why';
+        w.innerHTML=`<h3>${why.q}</h3>`+why.opts.map((o,k)=>`<button class="btn" data-k="${k}">${o[0]}</button>`).join('')+'<div class="fb"></div>';
+        area.appendChild(w);let done=false;
+        w.querySelectorAll('[data-k]').forEach(x=>x.onclick=()=>{if(done)return;done=true;w.querySelectorAll('[data-k]').forEach(y=>y.disabled=true);const o=why.opts[+x.dataset.k];
+          if(o[1]){x.classList.add('sel-ok');w.querySelector('.fb').className='fb ok';w.querySelector('.fb').innerHTML='✓ '+o[2];pass('一次答對，理由正確');}
+          else{w.querySelector('.fb').className='fb no';w.querySelector('.fb').innerHTML=o[2];
+            runGuides(area,o[3],()=>{say('補強完成！你已經理解了。','ok');pass('答對，但理由需補強');});}});
+      } else {say('✓ 這次答對了！','ok');pass(`補強後答對（第 ${tries+1} 次作答）`);}
+      return;}
+    b.classList.add('wrong');tries++;lock(true);
+    if(tries>=2){say('沒關係，我們一起看完整的解法：','no');const e=document.createElement('div');e.className='gcard';e.innerHTML=explain;area.appendChild(e);
+      btns[correct].classList.add('right');pass('兩次未答對，看完整解法');return;}
+    say(`你選了 ${OPT[i].slice(0,3)}。先看看下面的例子，再作答一次：`,'no');
+    runGuides(area,guidesFor[i],retry);
+  });
+}
+
+/* ---------- 原題的補強卡 ---------- */
+const GB={type:'pairs',title:'M 可能是哪些數？',k:44,
+  think:'你是不是這樣想：「M 是 44 的倍數，可以是 44、88、132……；8 不是 132 的因數，所以甲錯。」看看下面的因數配對，自己判斷 M 可以是這個數嗎？',
+  items:[
+   {n:44,title:'① M 可以是 44 嗎？',ok:'44 的第二大因數是 22，不是 44。題目要 44 是 M「除了自己以外」最大的因數，所以 <b>M 不是 44，M 一定比 44 大</b>。'},
+   {n:88,title:'② M 可以是 88 嗎？',ok:'✓ 88 的第二大因數正好是 <b>44</b>（第 2 組，和 2 配對）→ <b>88 符合條件</b>。'},
+   {n:132,title:'③ M 可以是 132 嗎？',ok:'✗ 132 的第二大因數是 <b>66</b>（和 2 配對）；44 在第 3 組（和 3 配對），只是第三大 → <b>132 不是 M</b>。'}],
+  obs:{q:'看三個配對板：除了自己以外最大的因數，都在哪一組、和誰配對？',opts:[
+    ['都在第 2 組，和第二小的因數（最小的質因數 2）配對',true,'✓ 對！小配大，第二小配第二大。'],
+    ['和 1 配對',false,'和 1 配對的是原數自己（第 1 組）喔。'],
+    ['不一定',false,'再看一次三個板子的第 2 組，上排都是幾？']]},
+  ok:'用 132 推翻甲，是拿了不符合條件的數當反例，這個反駁不成立。選 (B) 時只想到「44 是 M 的因數」，卻忘了 44 必須是<b>第二大</b>。',
+  rule:'原數 ＝ 第二大的因數 × 最小的質因數<br>44 已含質因數 2，只能乘 2 → M 只有 88，8 一定是 M 的因數'};
+const GA={title:'N 只有 117 嗎？',pos:{n:117,note:'→ 117 符合條件'},neg:{n:78},negLabel:'再看一個',
+  ok:'78 除了自己以外最大的因數也是 39，<b>78 也符合條件</b>！N 可能是 78，78 不是 9 的倍數，所以「9 一定是 N 的因數」不成立。',
+  rule:'原數 ＝ 除了自己以外最大的因數 × 最小的質因數<br>39 的最小質因數是 3，可以乘 2 或 3 → N ＝ 78 或 117'};
+const EXPLAIN2=`<h3>📘 完整解法</h3><p>M 除了自己以外最大的因數是 44，44＝2²×11 已含質因數 2，所以 M 只能是 44×2＝88，8 是 88 的因數，<b>甲正確</b>。</p><p>N 除了自己以外最大的因數是 39，39＝3×13，可以乘 2 或 3，N＝78 或 117；78 不是 9 的倍數，<b>乙錯誤</b>。答案 <b>(C)</b>。</p>`;
+
+/* ---------- step 1 ---------- */
+bluck($('paper'),$('palette'),$('msg1'),[
+ '已知',{h:'正整數 <i>M</i> 的因數中，',k:'L',g:1},{h:'除了 <i>M</i> 之外最大的',k:'K',g:1},{h:'因數是',k:'L',g:1},{h:'2<sup>2</sup>×11',k:'C',g:1},'，',
+ {h:'正整數 <i>N</i> 的因數中，',k:'L',g:2},{h:'除了 <i>N</i> 之外最大的',k:'K',g:2},{h:'因數是',k:'L',g:2},{h:'3×13',k:'C',g:2},'。甲、乙兩人提出以下看法：<br>',
+ '【甲】',{h:'8',k:'C'},{h:'一定',k:'K'},'是 <i>M</i> 的因數<br>【乙】',{h:'9',k:'C'},{h:'一定',k:'K'},'是 <i>N</i> 的因數<br>對於甲、乙兩人的看法，',{h:'下列判斷何者正確？',k:'B'}
+],{B:1,L:2,C:4,K:4},'🎉 標完了！下一步請你自己作答。',()=>complete(1));
+
+/* ---------- step 2 ---------- */
+quiz({opts:$('opts2'),area:$('area2'),msg:$('msg2'),correct:2,
+  guidesFor:{0:[GA],1:[GB],3:[GB,GA]},
+  why:{q:'為什麼甲「8 一定是 M 的因數」正確？',opts:[
+    ['M 只能是 88，8 是 88 的因數',true,'沒錯！你真的懂了。'],
+    ['M 是 44 的倍數，所以 8 一定是 M 的因數',false,'答案對了，但理由有問題：44 的倍數像 132，8 就不是它的因數。看看下面的例子：',[GB]],
+    ['我是猜的',false,'誠實很好！我們用兩個例子確認一下：',[GB,GA]]]},
+  explain:EXPLAIN2,
+  finish:()=>{const d=document.createElement('div');d.className='summary';
+    d.innerHTML=`<h3>🎯 答案 (C) 甲正確，乙錯誤</h3><p style="margin:0">原數 ＝ 除了自己以外最大的因數 × 最小的質因數。M 只有 88；N 有 78、117。<br>反例必須先符合題目條件：132 不是 M，78 是 N。</p>`;
+    $('area2').appendChild(d);complete(2);}});
+
+/* ---------- step 3：相似題 ---------- */
+const G70={title:'P 一定是奇數嗎？',pos:{n:175,note:'→ 175 符合條件，是奇數'},neg:{n:70},negLabel:'再看一個',
+  ok:'70 除了自己以外最大的因數也是 35，<b>70 也是 P</b>，而 70 是偶數，所以「P 一定是奇數」不成立，甲錯誤。',
+  rule:'35 的最小質因數是 5，可以乘 2、3、5 → P ＝ 70、105、175'};
+const G210={type:'pairs',title:'P 可能是 210 嗎？',k:35,
+  think:'你是不是想到 P＝35×6＝210，比 200 大，所以乙錯？先檢查 210 有沒有符合條件。',
+  items:[{n:210,title:'P 可以是 210 嗎？',ok:'✗ 210 的第二大因數是 <b>105</b>（和 2 配對），35 在第 5 組 → <b>210 不是 P</b>。'}],
+  ok:'210 不能拿來推翻乙。P 最大是 175，小於 200，乙正確。',
+  rule:'35 只能乘 2、3、5（不大於最小質因數 5）→ P 最大是 35×5＝175'};
+bluck($('paper3'),$('palette3'),$('msg3'),[
+ '已知',{h:'正整數 <i>P</i> 的因數中，',k:'L',g:1},{h:'除了 <i>P</i> 之外最大的',k:'K',g:1},{h:'因數是',k:'L',g:1},{h:'5×7',k:'C',g:1},'。甲、乙兩人提出以下看法：<br>',
+ '【甲】<i>P</i> ',{h:'一定',k:'K'},'是奇數<br>【乙】<i>P</i> ',{h:'一定',k:'K'},'小於 ',{h:'200',k:'C'},'<br>對於甲、乙兩人的看法，',{h:'下列判斷何者正確？',k:'B'}
+],{B:1,L:1,C:2,K:3},'✓ 標完了！直接作答吧。',()=>{$('ans3').classList.remove('hidden');});
+quiz({opts:$('opts3'),area:$('area3'),msg:$('msg3b'),correct:3,
+  guidesFor:{0:[G70],1:[G210],2:[G70,G210]},
+  why:{q:'為什麼甲「P 一定是奇數」錯誤？',opts:[
+    ['P 可能是 70，70 符合條件又是偶數',true,'沒錯！而且你找的反例有先檢查條件。'],
+    ['P 可能是 140，140 是偶數',false,'140 的第二大因數是 70，不是 35，140 不是 P，這個反例無效。看看下面的例子：',[G70]],
+    ['我是猜的',false,'誠實很好！我們用例子確認一下：',[G70,G210]]]},
+  explain:`<h3>📘 完整解法</h3><p>35＝5×7，最小質因數是 5，可以乘 2、3、5 → P＝70、105、175。70 是偶數，<b>甲錯誤</b>；最大的 175 也小於 200，<b>乙正確</b>。答案 <b>(D)</b>。</p>`,
+  finish:()=>{const d=document.createElement('div');d.className='summary';
+    d.innerHTML=`<h3>🏅 完成！答案 (D) 甲錯誤，乙正確</h3><p style="margin:0">你的作答紀錄：</p><ol style="margin:4px 0 0"><li>原題：${path[0]||'—'}</li><li>相似題：${path[1]||'—'}</li></ol><p class="timebox">⏱ 完成時間：${fmtTime()}</p><a class="morelink" href="https://chunhui0531-lab.github.io/teaching-hub/factor-pair-detective/" target="_blank" rel="noopener">🕵️ 還想再練？去因數配對偵探闖關 →</a>`;
+    $('area3').appendChild(d);complete(3);}});
+
+show(1);
+</script>
+</body>
+</html>

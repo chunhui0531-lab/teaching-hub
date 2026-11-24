@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>因數配對偵探</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff8ef; --card:#ffffff; --ink:#4a3b35; --muted:#9a8a80; --line:#f1e4d6;
+  --peach:#ffb38a; --peach-d:#f0864f; --mint:#9fe0c8; --mint-d:#3fae8a;
+  --sky:#a9d4ff; --sky-d:#4a90d9; --lemon:#ffe58a; --lemon-d:#e3b100;
+  --pink:#ffb7cf; --pink-d:#e0608d; --lav:#cdb9ff; --lav-d:#8466e0;
+  --bad:#ef6b6b; --ok:#38b07f;
+  --surface:#ffffff; --surface2:#fffaf4; --dot:#f6e3cf; --soft:#f6efe7; --badsoft:#ffd3d3; --oksoft:#e4f8ee; --nosoft:#fff0f0;
+  --revealbg:#fff6e0; --exambg:#fffdf8; --chiphover:#fff0e6; --solvedbg:#fbfffd;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1d1a18; --card:#2a2522; --ink:#f1e7df; --muted:#b3a69b; --line:#4a403a;
+  --peach:#a8572e; --peach-d:#f0a070; --mint:#2f7d63; --mint-d:#6fd3ae; --sky:#2f5f8f; --sky-d:#8cc3ff; --lemon:#8a6d10; --lemon-d:#f0cc4a;
+  --pink:#9c3d61; --pink-d:#ff9cc0; --lav:#5b47a8; --lav-d:#c2b0ff; --bad:#ff8a8a; --ok:#6fd3ae;
+  --surface:#332d29; --surface2:#2f2a27; --dot:#3a322d; --soft:#3d3530; --badsoft:#5a2a2a; --oksoft:#1f3d31; --nosoft:#3d2424;
+  --revealbg:#3a3220; --exambg:#2f2a27; --chiphover:#3d3026; --solvedbg:#26332d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1d1a18; --card:#2a2522; --ink:#f1e7df; --muted:#b3a69b; --line:#4a403a;
+  --peach:#a8572e; --peach-d:#f0a070; --mint:#2f7d63; --mint-d:#6fd3ae; --sky:#2f5f8f; --sky-d:#8cc3ff; --lemon:#8a6d10; --lemon-d:#f0cc4a;
+  --pink:#9c3d61; --pink-d:#ff9cc0; --lav:#5b47a8; --lav-d:#c2b0ff; --bad:#ff8a8a; --ok:#6fd3ae;
+  --surface:#332d29; --surface2:#2f2a27; --dot:#3a322d; --soft:#3d3530; --badsoft:#5a2a2a; --oksoft:#1f3d31; --nosoft:#3d2424;
+  --revealbg:#3a3220; --exambg:#2f2a27; --chiphover:#3d3026; --solvedbg:#26332d; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;font-size:19px;line-height:1.6;
+  background-image:radial-gradient(var(--dot) 1.5px,transparent 1.5px);background-size:26px 26px}
+button{font-family:inherit;color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:16px 20px 48px}
+
+/* header */
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.mascot{width:96px;height:96px;flex:none;cursor:pointer}
+.mascot.bounce{animation:bounce .55s}
+@keyframes bounce{0%,100%{transform:translateY(0)}30%{transform:translateY(-14px) rotate(-4deg)}60%{transform:translateY(0) rotate(3deg)}}
+.bubble{position:relative;flex:1;min-width:220px;background:var(--surface);border:3px solid var(--ink);border-radius:22px;padding:12px 18px;font-size:19px;min-height:64px;display:flex;align-items:center}
+.bubble:before{content:"";position:absolute;left:-15px;top:24px;border:9px solid transparent;border-right:14px solid var(--ink)}
+.bubble:after{content:"";position:absolute;left:-9px;top:27px;border:6px solid transparent;border-right:10px solid var(--surface)}
+.stats{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.stars{background:var(--lemon);border:3px solid var(--ink);border-radius:999px;padding:4px 14px;font-size:20px;white-space:nowrap}
+.stars.pop{animation:pop .4s}
+@keyframes pop{50%{transform:scale(1.25)}}
+.mute{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:2px 12px;font-size:15px;cursor:pointer;min-height:44px}
+.tools2{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+h1{font-size:30px;margin:12px 0 2px;letter-spacing:.06em}
+.sub{color:var(--muted);font-size:15px;margin:0 0 10px}
+
+/* tabs */
+nav{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}
+nav button{border:3px solid var(--ink);background:var(--surface);min-height:48px;padding:8px 16px;border-radius:16px;font-size:17px;cursor:pointer;box-shadow:0 4px 0 var(--ink);transition:transform .1s}
+nav button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+nav button.on{background:var(--peach)}
+nav button[data-tab=t4].on{background:var(--lav)}
+
+.card{background:var(--card);border:3px solid var(--ink);border-radius:24px;padding:20px 22px;margin-bottom:16px;box-shadow:0 6px 0 rgba(74,59,53,.15)}
+.q{font-size:21px;margin:0 0 12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:15px}
+.chip{font-size:16px;padding:4px 14px;min-height:44px;min-width:48px;border-radius:999px;border:2px solid var(--line);background:var(--surface2);cursor:pointer}
+.chip:hover,.chip.on{border-color:var(--peach-d);background:var(--chiphover)}
+input[type=number]{font-family:inherit;font-size:22px;width:120px;padding:6px 12px;border:3px solid var(--line);border-radius:14px;color:var(--ink);background:var(--surface);min-height:48px}
+input[type=number]:focus{outline:none;border-color:var(--peach-d)}
+.btn{font-size:18px;padding:8px 20px;border-radius:14px;border:3px solid var(--ink);background:var(--mint);cursor:pointer;box-shadow:0 4px 0 var(--ink)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn.peach{background:var(--peach)} .btn.lemon{background:var(--lemon)} .btn.sky{background:var(--sky)}
+.btn:disabled{opacity:.45;cursor:default}
+.hidden{display:none!important}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+
+/* tab1: balls */
+.stage{position:relative;overflow-x:auto;padding-top:190px;padding-bottom:6px}
+.stage svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.balls{display:flex;gap:12px;justify-content:center;min-width:max-content;padding:0 8px;position:relative}
+.ball{position:relative;width:66px;height:74px;border:none;background:none;cursor:pointer;padding:0}
+.ball .body{position:absolute;left:3px;top:6px;width:60px;height:60px;border-radius:50%;background:var(--surface);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700;transition:transform .15s}
+.ball .face{position:absolute;left:0;right:0;bottom:-2px;font-size:11px;text-align:center;color:var(--ink);letter-spacing:2px}
+.ball:hover .body{transform:translateY(-4px)}
+.ball.sel .body{transform:translateY(-10px) scale(1.08);box-shadow:0 0 0 5px var(--lemon)}
+.ball.done{cursor:default}
+.ball.done .body{color:#4a3b35}
+.ball.done .body{transform:none}
+.ball.star .body{box-shadow:0 0 0 5px var(--peach-d)}
+.formula{font-size:30px;text-align:center;margin:14px 0 4px}
+.formula .a{color:var(--peach-d)} .formula .b{color:var(--sky-d)}
+.reveal{background:var(--revealbg);border:3px dashed var(--lemon-d);border-radius:18px;padding:14px 18px;margin-top:14px}
+.progress{font-size:16px;color:var(--muted)}
+
+/* tab2: suspects */
+.suspects{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.sus{border:3px solid var(--ink);border-radius:20px;padding:12px;background:var(--surface);text-align:center;position:relative;min-height:240px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.sus .num{font-size:30px;font-weight:700}
+.sus .who{font-size:44px;line-height:1}
+.sus .ask{font-size:15px;color:var(--muted)}
+.sus .facts{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;font-size:14px}
+.sus .facts span{background:var(--soft);border-radius:6px;padding:1px 6px}
+.sus .facts span.big{background:var(--sky);font-weight:700}
+.stamp{position:absolute;top:10px;right:-6px;transform:rotate(14deg);border:3px solid;border-radius:10px;padding:2px 8px;font-size:17px;font-weight:700;background:var(--surface);animation:stamp .35s}
+.stamp.yes{color:var(--ok);border-color:var(--ok)} .stamp.no{color:var(--bad);border-color:var(--bad)}
+@keyframes stamp{from{transform:rotate(14deg) scale(2.2);opacity:0}to{transform:rotate(14deg) scale(1);opacity:1}}
+.sus .btns{display:flex;gap:6px;margin-top:auto}
+.sus .btns button{font-size:16px;padding:4px 12px;min-height:44px;border-radius:10px;border:2px solid var(--ink);cursor:pointer;background:var(--mint)}
+.sus .btns button.n{background:var(--pink)}
+.sus .res{font-size:15px;margin-top:auto}
+.sus.solved{background:var(--solvedbg)}
+
+/* tab3: keys */
+.lock{font-size:28px;text-align:center;margin:8px 0 14px}
+.lock .k{background:var(--lemon);border:3px solid var(--ink);border-radius:12px;padding:0 12px}
+.keys{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.key{width:86px;height:86px;border-radius:20px;border:3px solid var(--ink);background:var(--surface);font-size:30px;font-weight:700;cursor:pointer;position:relative;box-shadow:0 4px 0 var(--ink);transition:transform .1s}
+.key small{position:absolute;bottom:2px;left:0;right:0;font-size:13px;color:var(--muted);font-weight:400}
+.key.on{background:var(--lemon);transform:translateY(-4px)}
+.key.good{background:var(--mint)} .key.badk{background:var(--badsoft)}
+.levels{display:flex;gap:8px;flex-wrap:wrap}
+.lv{border:2px solid var(--line);border-radius:12px;padding:4px 12px;min-height:44px;background:var(--surface);cursor:pointer;font-size:16px}
+.lv.on{border-color:var(--ink);background:var(--peach)}
+.lv.clear:after{content:" ⭐"}
+table{border-collapse:collapse;width:100%;font-size:17px;margin-top:10px}
+td,th{border-bottom:2px dashed var(--line);padding:6px;text-align:center}
+th{font-size:14px;color:var(--muted);font-weight:400}
+
+/* tab4 */
+.exam{background:var(--exambg);border:3px solid var(--ink);border-radius:18px;padding:16px 20px;font-size:19px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.opt{border:3px solid var(--ink);border-radius:16px;padding:12px;font-size:19px;background:var(--surface);cursor:pointer;box-shadow:0 4px 0 var(--ink);text-align:left}
+.opt.right{background:var(--mint)} .opt.wrong{background:var(--badsoft)}
+.fb{margin-top:14px;padding:14px 18px;border-radius:16px;font-size:18px}
+.fb.ok{background:var(--oksoft);border:3px solid var(--ok)} .fb.no{background:var(--nosoft);border:3px solid var(--bad)}
+@media(max-width:640px){.opts{grid-template-columns:1fr}.mascot{width:72px;height:72px}}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sky-d);outline-offset:2px}
+@media(max-width:420px){.wrap{padding:12px 10px 40px}h1{font-size:24px}.card{padding:16px 14px}.lock{font-size:22px}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="wrap">
+  <div class="top">
+    <svg class="mascot" id="mascot" viewBox="0 0 120 120" role="img" aria-label="偵探丸子">
+      <ellipse cx="60" cy="112" rx="30" ry="5" fill="#000" opacity=".08"/>
+      <circle cx="58" cy="70" r="38" fill="#ffc9a3" stroke="#4a3b35" stroke-width="4"/>
+      <!-- hat -->
+      <path d="M22 50 Q58 8 96 50 Z" fill="#a8744f" stroke="#4a3b35" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M14 52 Q58 40 104 52 Q58 60 14 52 Z" fill="#8b5d3c" stroke="#4a3b35" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="59" cy="22" r="5" fill="#8b5d3c" stroke="#4a3b35" stroke-width="3"/>
+      <!-- face -->
+      <g id="eyesOpen"><circle cx="45" cy="72" r="4.5" fill="#4a3b35"/><circle cx="70" cy="72" r="4.5" fill="#4a3b35"/></g>
+      <g id="eyesHappy" style="display:none"><path d="M40 73 Q45 66 50 73" stroke="#4a3b35" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M65 73 Q70 66 75 73" stroke="#4a3b35" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+      <ellipse cx="37" cy="83" rx="6" ry="4" fill="#ff8fa3" opacity=".6"/><ellipse cx="79" cy="83" rx="6" ry="4" fill="#ff8fa3" opacity=".6"/>
+      <path id="mouth" d="M52 84 Q58 90 64 84" stroke="#4a3b35" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <!-- magnifier -->
+      <line x1="98" y1="92" x2="112" y2="108" stroke="#4a3b35" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="91" cy="84" r="12" fill="#dff1ff" stroke="#4a3b35" stroke-width="4"/>
+      <path d="M85 79 Q88 76 92 77" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="bubble" id="say">嗨！我是偵探丸子 🔍 一起來破解「因數配對」的祕密吧！</div>
+    <div class="stats">
+      <div class="stars" id="stars">⭐ 0</div>
+      <div class="tools2"><button class="mute" id="mute">🔊 音效開</button><button class="mute" id="themeBtn">◐ 深淺色</button><button class="mute" id="fsBtn">⛶ 全螢幕</button></div>
+    </div>
+  </div>
+  <h1>因數配對偵探社</h1>
+  <p class="sub">115 會考第 20 題特訓：由「除了自己以外最大的因數」推回原數</p>
+
+  <nav>
+    <button data-tab="t1" class="on">🤝 任務一　因數牽手</button>
+    <button data-tab="t2">🕵️ 任務二　嫌疑犯檢驗</button>
+    <button data-tab="t3">🔑 任務三　逆推開鎖</button>
+    <button data-tab="t4">👑 魔王關　會考真題</button>
+  </nav>
+
+  <!-- T1 -->
+  <section id="t1">
+    <div class="card">
+      <p class="q">幫因數們找到「舞伴」！點兩個數，乘起來剛好等於 <b id="n1show">36</b> 就能牽手 💃</p>
+      <div class="row">
+        <span class="hint">選一個數：</span><span class="row" id="pre1"></span>
+        <span class="hint">或自己輸入</span><input type="number" id="n1" placeholder="例如 100" min="4" max="5000"><button class="btn" id="go1">開始</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stage" id="stage"><svg id="arcs"></svg><div class="balls" id="balls"></div></div>
+      <p class="progress" id="prog1" style="text-align:center"></p>
+      <div class="reveal hidden" id="rev1"></div>
+    </div>
+  </section>
+
+  <!-- T2 -->
+  <section id="t2" class="hidden">
+    <div class="card">
+      <p class="q">🚨 線報：真兇 M「除了自己以外最大的因數」是 <b id="k2show">44</b></p>
+      <div class="row"><span class="hint">換一個案件：</span><span class="row" id="pre2"></span></div>
+      <p class="hint" style="margin:8px 0 0">下面每個嫌疑犯都有因數 <b class="k2">44</b>。先猜猜他是不是真兇，再按按鈕驗證！猜對得 ⭐</p>
+    </div>
+    <div class="suspects" id="sus"></div>
+    <div class="card reveal hidden" id="rev2" style="margin-top:16px"></div>
+  </section>
+
+  <!-- T3 -->
+  <section id="t3" class="hidden">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div class="levels" id="levels"></div>
+        <button class="chip" id="rand3">🎲 隨機挑戰</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="lock">🔒 原數的「除了自己最大的因數」是 <span class="k" id="k3show">44</span><br>原數 = <span id="k3b">44</span> × 🔑，哪些鑰匙打得開？</div>
+      <div class="keys" id="keys"></div>
+      <div class="row" style="justify-content:center;margin-top:18px">
+        <button class="btn peach" id="unlock">🔓 開鎖！</button>
+        <button class="btn sky hidden" id="next3">下一關 ➜</button>
+      </div>
+      <div class="reveal hidden" id="rev3"></div>
+    </div>
+  </section>
+
+  <!-- T4 -->
+  <section id="t4" class="hidden">
+    <div class="card">
+      <div class="exam">
+        已知正整數 <i>M</i> 的因數中，除了 <i>M</i> 之外最大的因數是 2<sup>2</sup>×11，正整數 <i>N</i> 的因數中，除了 <i>N</i> 之外最大的因數是 3×13。甲、乙兩人提出以下看法：<br>
+        【甲】8 一定是 <i>M</i> 的因數<br>【乙】9 一定是 <i>N</i> 的因數<br>
+        對於甲、乙兩人的看法，下列判斷何者正確？
+      </div>
+      <div class="opts" id="opts"></div>
+      <div id="fb4"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const factors=n=>{const s=[],b=[];for(let i=1;i*i<=n;i++)if(n%i===0){s.push(i);if(i*i!==n)b.unshift(n/i);}return s.concat(b);};
+const spf=n=>{if(n%2===0)return 2;for(let i=3;i*i<=n;i+=2)if(n%i===0)return i;return n;};
+const lpf=n=>n/spf(n);
+const isPrime=n=>n>1&&spf(n)===n;
+const pfStr=n=>{const r=[];let m=n;for(let p=2;p*p<=m;p++){let e=0;while(m%p===0){m/=p;e++;}if(e)r.push(e>1?`${p}<sup>${e}</sup>`:p);}if(m>1)r.push(m);return r.join('×');};
+
+/* ---------- sound, stars, mascot ---------- */
+let soundOn=true,ac=null;
+function tone(freqs,dur=.12,type='sine',gap=.09){if(!soundOn)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();freqs.forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;const t=ac.currentTime+i*gap;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.18,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+dur+.02);});}catch(e){}}
+const sfx={pop:()=>tone([660],.08,'triangle'),ok:()=>tone([660,880,1100],.15,'triangle'),bad:()=>tone([220,180],.18,'square',.12),win:()=>tone([523,659,784,1046,1318],.2,'triangle',.1)};
+$('themeBtn').onclick=()=>{const r=document.documentElement;const d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.dataset.theme=d?'light':'dark';};
+$('fsBtn').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{});}catch(e){}};
+$('mute').onclick=()=>{soundOn=!soundOn;$('mute').textContent=soundOn?'🔊 音效開':'🔇 音效關';};
+let stars=0;
+function addStar(n=1){stars+=n;const s=$('stars');s.textContent='⭐ '+stars;s.classList.remove('pop');void s.offsetWidth;s.classList.add('pop');}
+function say(html,mood='think'){
+  $('say').innerHTML=html;
+  $('eyesOpen').style.display=mood==='happy'?'none':'';
+  $('eyesHappy').style.display=mood==='happy'?'':'none';
+  $('mouth').setAttribute('d',mood==='sad'?'M52 88 Q58 82 64 88':mood==='happy'?'M50 82 Q58 94 66 82':'M52 84 Q58 90 64 84');
+  const m=$('mascot');m.classList.remove('bounce');void m.offsetWidth;m.classList.add('bounce');
+}
+$('mascot').onclick=()=>{sfx.pop();say(['偵探守則一：找到答案，一定要<b>回去檢查題目條件</b>！','偵探守則二：最小的因數配最大的，第二小的配第二大的 🤝','偵探守則三：除了 1 以外最小的因數，一定是<b>質數</b>喔！'][Math.floor(Math.random()*3)],'happy');};
+function shake(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+
+/* confetti */
+const cv=$('confetti'),cx=cv.getContext('2d');let parts=[],raf=null;
+function confetti(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;cv.width=innerWidth;cv.height=innerHeight;const cols=['#ffb38a','#9fe0c8','#a9d4ff','#ffe58a','#ffb7cf','#cdb9ff'];
+  for(let i=0;i<140;i++)parts.push({x:innerWidth/2+(Math.random()-.5)*200,y:innerHeight*.35,vx:(Math.random()-.5)*14,vy:-Math.random()*12-4,r:Math.random()*6+4,c:cols[i%6],a:Math.random()*6,life:0});
+  if(!raf)loop();}
+function loop(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.a+=.2;p.life++;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);cx.restore();});
+  parts=parts.filter(p=>p.y<cv.height+20&&p.life<220);raf=parts.length?requestAnimationFrame(loop):(cx.clearRect(0,0,cv.width,cv.height),null);}
+
+/* tabs */
+function showTab(id){document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x.dataset.tab===id));['t1','t2','t3','t4'].forEach(t=>$(t).classList.toggle('hidden',t!==id));
+  if(id==='t1')requestAnimationFrame(drawArcs);
+  const intro={t1:'點兩個因數，讓它們手牽手！乘積要剛好等於原數喔 🤝',t2:'這些嫌疑犯都有因數 '+K2+'……但真兇只有一個！先猜再驗證 🕵️',t3:'選出所有打得開鎖的質數鑰匙 🔑，可以不只一把喔！',t4:'魔王登場！用前面學到的偵探技巧打倒它 👑'}[id];say(intro);}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{sfx.pop();showTab(b.dataset.tab);});
+const chipRow=(el,vals,fn,cur)=>{el.innerHTML='';vals.forEach(v=>{const c=document.createElement('button');c.className='chip'+(v===cur?' on':'');c.textContent=v;c.onclick=()=>{sfx.pop();fn(v);};el.appendChild(c);});};
+
+/* ---------- T1 因數牽手 ---------- */
+const PAL=['#ffb38a','#9fe0c8','#a9d4ff','#ffe58a','#ffb7cf','#cdb9ff','#ffd59e','#b8f0a0'];
+const FACES=['•ᴗ•','˘ᴗ˘','•ω•','ᵔᴥᵔ','•‿•','◕ᴗ◕'];
+let N1=36,F1=[],paired={},pairs=[],sel=null;
+function start1(n){
+  N1=n;F1=factors(n);paired={};pairs=[];sel=null;$('n1show').textContent=n;$('rev1').classList.add('hidden');
+  chipRow($('pre1'),[36,60,45,77,88,117],start1,n);
+  if(F1.length>16){$('balls').innerHTML='';$('arcs').innerHTML='';$('prog1').innerHTML=`${n} 有 ${F1.length} 個因數，太多啦！換一個小一點的數吧 😵`;return;}
+  $('balls').innerHTML=F1.map((v,i)=>`<button class="ball" data-i="${i}"><div class="body">${v}</div><div class="face">${FACES[i%FACES.length]}</div></button>`).join('');
+  document.querySelectorAll('.ball').forEach(b=>b.onclick=()=>click1(+b.dataset.i));
+  if(isPrime(n))say(`${n} 是質數，只有 1 和 ${n} 兩個因數，太孤單了～換一個吧！`);
+  else say(`${n} 有 ${F1.length} 個因數，幫它們兩兩配對吧！`);
+  prog1();drawArcs();
+}
+function prog1(){const total=Math.ceil(F1.length/2);$('prog1').textContent=`已配對 ${pairs.length} / ${total} 組`;}
+function click1(i){
+  if(paired[i]!==undefined)return;const el=document.querySelectorAll('.ball')[i];
+  if(sel===null){sel=i;el.classList.add('sel');sfx.pop();return;}
+  const a=F1[sel],b=F1[i],e1=document.querySelectorAll('.ball')[sel];
+  if(sel===i){ if(a*a===N1){makePair(i,i);} else {el.classList.remove('sel');sel=null;} return;}
+  if(a*b===N1){makePair(sel,i);}
+  else{sfx.bad();shake(el);shake(e1);e1.classList.remove('sel');say(`${a} × ${b} = ${a*b}，不是 ${N1} 喔～再找找 🤔`,'sad');sel=null;}
+}
+function makePair(i,j){
+  const c=PAL[pairs.length%PAL.length];paired[i]=paired[j]=pairs.length;pairs.push([Math.min(i,j),Math.max(i,j)]);
+  const bs=document.querySelectorAll('.ball');[i,j].forEach(k=>{bs[k].classList.remove('sel');bs[k].classList.add('done');bs[k].querySelector('.body').style.background=c;});
+  sel=null;sfx.ok();addStar();say(`${F1[i]} × ${F1[j]} = ${N1}，配對成功！💕`,'happy');prog1();drawArcs();
+  if(pairs.length===Math.ceil(F1.length/2))setTimeout(finish1,500);
+}
+function finish1(){
+  const s=spf(N1),g=N1/s;sfx.win();confetti();
+  const bs=document.querySelectorAll('.ball');bs[1].classList.add('star');bs[F1.length-2].classList.add('star');drawArcs();
+  say(`全部配對完成！🎉 你有沒有發現：<b>最小配最大、第二小配第二大</b>？`,'happy');
+  $('rev1').classList.remove('hidden');
+  $('rev1').innerHTML=`<b>🔍 偵探發現：</b>看看第二組舞伴（橘色光圈）——<br>
+   <div class="formula">${N1} = <span class="a">${s}</span> × <span class="b">${g}</span></div>
+   <div style="text-align:center"><span style="color:var(--peach-d)">除了 1 以外最小的因數 ${s}</span>　配對　<span style="color:var(--sky-d)">除了自己以外最大的因數 ${g}</span></div>
+   <p style="margin:10px 0 0">💡 想一想：除了 1 以外最小的因數，為什麼<b>一定是質數</b>？（提示：如果它是合數，它自己的因數會更小……）</p>
+   <p style="margin:6px 0 0;font-size:22px;text-align:center"><b>原數 ＝ 除了自己以外最大的因數 × 最小的質因數</b></p>`;
+}
+function drawArcs(){
+  const st=$('stage'),svg=$('arcs');if(!st.offsetParent)return;const sr=st.getBoundingClientRect(),bs=document.querySelectorAll('.ball');
+  svg.setAttribute('width',st.scrollWidth);svg.setAttribute('height',st.scrollHeight);
+  const done=pairs.length===Math.ceil(F1.length/2);
+  svg.innerHTML=pairs.map((p,k)=>{const r1=bs[p[0]].getBoundingClientRect(),r2=bs[p[1]].getBoundingClientRect();
+    const x1=r1.left-sr.left+st.scrollLeft+33,x2=r2.left-sr.left+st.scrollLeft+33,y=190+4;
+    const isKey=done&&p[0]===1;const col=isKey?'#f0864f':PAL[k%PAL.length];
+    if(p[0]===p[1])return `<text x="${x1}" y="${y-14}" text-anchor="middle" font-size="22">💞</text>`;
+    const rx=(x2-x1)/2,ry=Math.min(rx*.95,30+140*(p[1]-p[0])/Math.max(1,F1.length-1));
+    return `<path d="M${x1} ${y} A ${rx} ${ry} 0 0 1 ${x2} ${y}" fill="none" stroke="${col}" stroke-width="${isKey?7:5}" stroke-linecap="round"/><text x="${(x1+x2)/2}" y="${y-ry-6}" text-anchor="middle" font-size="20" fill="${col}">${isKey?'⭐':'♥'}</text>`;}).join('');
+}
+addEventListener('resize',drawArcs);$('stage').addEventListener('scroll',drawArcs);
+$('go1').onclick=()=>{const v=+$('n1').value;if(Number.isInteger(v)&&v>=4&&v<=5000)start1(v);else{sfx.bad();say('請輸入 4～5000 的正整數喔','sad');}};
+
+/* ---------- T2 嫌疑犯 ---------- */
+let K2=44;const SUSF=['🐱','🐶','🐰','🦊','🐻','🐼'];
+function start2(k){
+  K2=k;$('k2show').textContent=k;document.querySelectorAll('.k2').forEach(e=>e.textContent=k);$('rev2').classList.add('hidden');
+  chipRow($('pre2'),[44,39,35,15],start2,k);
+  const list=[1,2,3,4,5].map(i=>k*i);
+  $('sus').innerHTML=list.map((m,i)=>`<div class="sus" data-m="${m}"><div class="who">${SUSF[i]}</div><div class="num">M = ${m}</div><div class="ask">${m===k?`（它就是 ${k} 本人）`:`= ${k} × ${i+1}`}</div>
+    <div class="btns"><button class="y">是真兇</button><button class="n">不是</button></div></div>`).join('');
+  document.querySelectorAll('.sus').forEach(c=>{c.querySelector('.y').onclick=()=>judge(c,true);c.querySelector('.n').onclick=()=>judge(c,false);});
+}
+function judge(card,guess){
+  const m=+card.dataset.m,f=factors(m),g=lpf(m),truth=g===K2;
+  card.classList.add('solved');
+  card.querySelector('.btns').outerHTML=`<div class="facts">${f.map(v=>`<span class="${v===g?'big':''}">${v}</span>`).join('')}</div>
+    <div class="res">除了自己最大的因數：<b>${g}</b><br>${guess===truth?'🎯 你猜對了！':'😮 猜錯了～'}</div>`;
+  card.insertAdjacentHTML('beforeend',`<div class="stamp ${truth?'yes':'no'}">${truth?'真兇！':'不在場'}</div>`);
+  if(guess===truth){sfx.ok();addStar();say(truth?`沒錯！${m} 除了自己最大的因數就是 ${K2}，抓到了！🚔`:`答對！${m} 除了自己最大的因數是 ${g}，比 ${K2} 還大，所以不是它 👍`,'happy');}
+  else{sfx.bad();shake(card);say(truth?`其實 ${m} 就是真兇喔！它除了自己最大的因數剛好是 ${K2}`:`${m} 雖然有因數 ${K2}，但它除了自己最大的因數是 <b>${g}</b>，不是 ${K2}！`,'sad');}
+  if(document.querySelectorAll('.sus .btns').length===0)setTimeout(()=>{
+    const real=[1,2,3,4,5].map(i=>K2*i).filter(m=>lpf(m)===K2);
+    $('rev2').classList.remove('hidden');
+    $('rev2').innerHTML=`<b>📋 結案報告</b>
+      <table><tr><th>條件</th><th>符合的 M</th></tr>
+      <tr><td>「${K2} 是 M 的因數」</td><td>${[1,2,3,4,5].map(i=>K2*i).join('、')}……（無限多個）</td></tr>
+      <tr><td>「${K2} 是 M 除了自己以外最大的因數」</td><td><b style="color:var(--peach-d)">${real.join('、')}</b>${real.length===1?'（只有一個！）':''}</td></tr></table>
+      <p style="margin:10px 0 0">💡 偵探守則：找到候選答案後，一定要<b>回去檢查題目條件</b>！</p>`;
+    sfx.win();confetti();say('結案！看看結案報告，兩種條件差很多吧？','happy');},600);
+}
+
+/* ---------- T3 逆推開鎖 ---------- */
+const LEVELS=[44,39,35,15,91];let K3=44,curLv=0,cleared={},chosen=new Set(),solved3=false;
+function keyList(k){const s=spf(k),ps=[];let extra=0;for(let p=2;;p++){if(isPrime(p)){ps.push(p);if(p>s&&++extra>=2&&ps.length>=5)break;}}return ps;}
+function drawLevels(){$('levels').innerHTML=LEVELS.map((k,i)=>`<button class="lv${i===curLv?' on':''}${cleared[k]?' clear':''}" data-i="${i}">第 ${i+1} 關</button>`).join('');
+  document.querySelectorAll('.lv').forEach(b=>b.onclick=()=>{sfx.pop();curLv=+b.dataset.i;start3(LEVELS[curLv]);});}
+function start3(k){
+  K3=k;chosen=new Set();solved3=false;$('k3show').textContent=k;$('k3b').textContent=k;$('rev3').classList.add('hidden');$('next3').classList.add('hidden');$('unlock').disabled=false;
+  drawLevels();
+  $('keys').innerHTML=keyList(k).map(p=>`<button class="key" data-p="${p}">${p}<small>${k*p}</small></button>`).join('');
+  document.querySelectorAll('.key').forEach(b=>b.onclick=()=>{if(solved3)return;sfx.pop();const p=+b.dataset.p;chosen.has(p)?chosen.delete(p):chosen.add(p);b.classList.toggle('on');});
+}
+$('unlock').onclick=()=>{
+  if(!chosen.size){sfx.bad();say('先選鑰匙再開鎖喔 🔑','sad');return;}
+  const s=spf(K3),good=keyList(K3).filter(p=>p<=s);
+  const extra=[...chosen].filter(p=>p>s),miss=good.filter(p=>!chosen.has(p));
+  if(!extra.length&&!miss.length){
+    solved3=true;sfx.win();confetti();addStar(3);cleared[K3]=true;drawLevels();
+    document.querySelectorAll('.key').forEach(b=>{const p=+b.dataset.p;b.classList.remove('on');b.classList.add(p<=s?'good':'badk');});
+    say(`開鎖成功！🎉 ${good.length===1?'答案只有一個！':'答案有 '+good.length+' 個喔！'}`,'happy');
+    $('rev3').classList.remove('hidden');
+    $('rev3').innerHTML=`<b>🔓 破案！</b>${K3} = ${pfStr(K3)}，最小的質因數是 <b>${s}</b>。<br>
+      鑰匙 p 必須 <b>≤ ${s}</b>，所以原數是：<b style="color:var(--peach-d)">${good.map(p=>K3*p).join('、')}</b><br>
+      <span class="hint">為什麼 p 不能比 ${s} 大？因為 ${K3}×p ÷ ${s} 會得到一個比 ${K3} 還大的因數！${s===2?'（k 是偶數 → 只有一個答案）':'（k 是奇數 → 答案不只一個）'}</span>`;
+    $('unlock').disabled=true;$('next3').classList.remove('hidden');
+  } else {
+    sfx.bad();shake($('keys'));
+    if(extra.length){const p=extra[0],n=K3*p;say(`鑰匙 ${p} 打不開！${n} 除了自己最大的因數是 <b>${lpf(n)}</b>，不是 ${K3}。試試把 ${n} 的因數列出來看看 🧐`,'sad');}
+    else say(`還有漏掉的鑰匙喔！試試看 ${K3} × ${miss[0]} = ${K3*miss[0]}，它除了自己最大的因數是多少？`,'sad');
+  }
+};
+$('next3').onclick=()=>{sfx.pop();if(curLv<LEVELS.length-1){curLv++;start3(LEVELS[curLv]);}else rand3();};
+function rand3(){sfx.pop();curLv=-1;let k;do{k=10+Math.floor(Math.random()*140);}while(LEVELS.includes(k)||isPrime(k)||spf(k)>7);start3(k);say(`隨機挑戰：k = ${k}，你能找出所有原數嗎？`);}
+$('rand3').onclick=rand3;
+
+/* ---------- T4 魔王 ---------- */
+const OPTS=[
+  {k:'A',t:'甲、乙皆正確',fb:'差一點！M = 44 × 2 = 88，所以甲對。但 N 除了 39 × 3 = 117 以外，還可以是 <b>39 × 2 = 78</b>（78 除了自己最大的因數也是 39），78 不是 9 的倍數，所以乙不一定對。',go:'t3',goT:'去任務三練 k = 39'},
+  {k:'B',t:'甲、乙皆錯誤',fb:'小心陷阱！如果取 M = 132，132 除了自己最大的因數是 <b>66</b>，不是 44，所以 132 根本不是 M。「44 是 M 的因數」和「44 是 M 除了自己最大的因數」差很多喔！',go:'t2',goT:'去任務二抓真兇'},
+  {k:'C',t:'甲正確，乙錯誤',fb:'',ok:true},
+  {k:'D',t:'甲錯誤，乙正確',fb:'想想看：44 = 2²×11，最小質因數是 2，所以 M 只能是 44 × 2 = 88，8 一定是 88 的因數，甲是對的！而 N 可以是 78，所以乙不一定對。',go:'t1',goT:'回任務一複習配對'}
+];
+let tries4=0;
+function start4(){$('opts').innerHTML=OPTS.map((o,i)=>`<button class="opt" data-i="${i}">(${o.k}) ${o.t}</button>`).join('');
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick4(b,OPTS[+b.dataset.i]));}
+function pick4(b,o){
+  tries4++;
+  if(o.ok){b.classList.add('right');sfx.win();confetti();setTimeout(confetti,400);addStar(tries4===1?5:2);
+    say('魔王被打倒了！🏆 你是名偵探！','happy');
+    $('fb4').innerHTML=`<div class="fb ok">🏆 <b>正確！</b><br>M：44 = 2²×11 最小質因數是 2，鑰匙只有 2 → M = 88 = 2³×11，<b>8 一定是 M 的因數</b>（甲對）。<br>
+      N：39 = 3×13 最小質因數是 3，鑰匙有 2、3 → N = 78 或 117。78 不是 9 的倍數，<b>乙不一定成立</b>（乙錯）。</div>`;}
+  else{b.classList.add('wrong');sfx.bad();shake(b);say('哎呀，被魔王打中了！看看提示再挑戰一次 💪','sad');
+    $('fb4').innerHTML=`<div class="fb no">❌ <b>(${o.k}) 不對喔</b><br>${o.fb}<div style="margin-top:10px"><button class="btn lemon" id="goBack">${o.goT} ➜</button></div></div>`;
+    $('goBack').onclick=()=>{sfx.pop();showTab(o.go);};}
+}
+
+start1(36);start2(44);start3(44);start4();
+</script>
+</body>
+</html>
